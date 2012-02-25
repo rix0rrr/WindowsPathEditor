@@ -36,7 +36,7 @@ namespace WindowsPathEditor
             SystemPath = new ObservableCollection<PathEntry>(reg.SystemPath);
             UserPath   = new ObservableCollection<PathEntry>(reg.UserPath);
 
-            SystemPath.Concat(UserPath).Each(x => checker.Check(x));
+            checker.Check(SystemPath.Concat(UserPath));
         }
 
         private void Write()

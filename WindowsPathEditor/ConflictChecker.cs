@@ -3,23 +3,59 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace WindowsPathEditor
 {
+    /// <summary>
+    /// Scans directories on disk for relevant files and raises events for them
+    /// </summary>
     public class ConflictChecker
     {
-        private ConcurrentQueue<PathEntry> remainder = new ConcurrentQueue<PathEntry>();
+        private readonly Thread checkerThread;
 
-        public void Check(PathEntry path)
+        private readonly BlockingCollection<PathEntry> work = new BlockingCollection<PathEntry>();
+        private readonly Dictionary<string, string> found   = new Dictionary<string,string>();
+
+        public ConflictChecker()
         {
-            if (!path.Exists)
-            {
-                path.AddIssue("Does not exist");
-                return;
-            }
+            checkerThread = new Thread(BackgroundChecker) { IsBackground=true };
+            checkerThread.Start();
+        }
 
-            remainder.Enqueue(path);
-            // FIXME: Do file checking in thread
+        /// <summary>
+        /// Check all points in the given set
+        /// </summary>
+        public void Check(IEnumerable<PathEntry> paths)
+        {
+            Clear();
+            
+            foreach (var path in paths)
+            {
+                if (!path.Exists)
+                {
+                    path.AddIssue("Does not exist");
+                    return;
+                }
+    
+                work.Add(path);
+                // FIXME: Do file checking in thread
+            }
+        }
+
+        private void Clear()
+        {
+            PathEntry pe;
+            while (remainder.TryDequeue(out pe)) /* Ignore */;
+            found.Clear();
+        }
+
+        private void BackgroundChecker()
+        {
+            while (true)
+            {
+                PathEntry path = work.Take();
+            }
         }
     }
 }

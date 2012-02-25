@@ -9,13 +9,17 @@
     </ListBox.Resources>
     <ListBox.ItemTemplate>
         <DataTemplate>
-            <StackPanel Orientation="Horizontal">
-                <Image Name="indicatorImage" Source="/WindowsPathEditor;component/Resources/folder.png" />
-                <TextBlock Text="{Binding SymbolicPath}" Margin="8,2,2,2"/>
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <Image Name="indicatorImage" Source="/WindowsPathEditor;component/Resources/folder.png" />
+                    <TextBlock Text="{Binding SymbolicPath}" Margin="8,2,2,2"/>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Issues}" Foreground="Red" FontSize="10" Margin="24,0,0,0">
+                </ItemsControl>
             </StackPanel>
 
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding Exists}" Value="False">
+                <DataTrigger Binding="{Binding HasIssues}" Value="True">
                     <Setter TargetName="indicatorImage" Property="Source" Value="/WindowsPathEditor;component/Resources/folder_delete.png" />
                 </DataTrigger>
             </DataTemplate.Triggers>
