@@ -3,3 +3,4 @@
 - Scan
 - UAC elevation
 - Saving
+- Disk scanning on background thread
