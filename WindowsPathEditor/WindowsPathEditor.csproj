@@ -62,8 +62,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ConflictChecker.cs" />
+    <Compile Include="AnnotatedPathEntry.cs" />
+    <Compile Include="AutoCompleteBox.xaml.cs">
+      <DependentUpon>AutoCompleteBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PathChecker.cs" />
+    <Compile Include="DragDropListBox\DragDropHelper.cs" />
+    <Compile Include="DragDropListBox\DraggedAdorner.cs" />
+    <Compile Include="DragDropListBox\InsertionAdorner.cs" />
+    <Compile Include="DragDropListBox\Utilities.cs" />
+    <Compile Include="PathMatch.cs" />
     <Compile Include="UAC.cs" />
+    <Page Include="AutoCompleteBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DirectoryList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -113,13 +126,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\folder.png" />
+    <Resource Include="Resources\accept.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\folder_delete.png" />
+    <Resource Include="Resources\error.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\folder_error.png" />
+    <Resource Include="Resources\delete.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

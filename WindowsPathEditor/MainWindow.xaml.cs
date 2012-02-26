@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace WindowsPathEditor
 {
@@ -21,22 +22,75 @@ namespace WindowsPathEditor
     public partial class MainWindow : Window
     {
         private readonly PathRegistry reg = new PathRegistry();
-        private readonly ConflictChecker checker = new ConflictChecker();
+        private readonly PathChecker checker;
+        private readonly object stateLock = new object();
+        private bool pathsDirty = false;
 
         public MainWindow()
         {
+            checker = new PathChecker(reg.ExecutableExtensions);
+
             InitializeComponent();
             ShieldIcon = UAC.GetShieldIcon();
+            searchBox.SetCompleteProvider(checker.Search);
 
             Read();
         }
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            checker.Dispose();
+        }
+
         private void Read()
         {
-            SystemPath = new ObservableCollection<PathEntry>(reg.SystemPath);
-            UserPath   = new ObservableCollection<PathEntry>(reg.UserPath);
+            SetPaths(reg.SystemPath, reg.UserPath);
+        }
 
-            checker.Check(SystemPath.Concat(UserPath));
+        private void SetPaths(IEnumerable<PathEntry> systemPath, IEnumerable<PathEntry> userPath)
+        {
+            lock(stateLock)
+            {
+                SystemPath = new ObservableCollection<AnnotatedPathEntry>(systemPath.Select(AnnotatedPathEntry.FromPath));
+                UserPath   = new ObservableCollection<AnnotatedPathEntry>(userPath.Select(AnnotatedPathEntry.FromPath));
+    
+                DirtyPaths();
+    
+                SystemPath.CollectionChanged += (a, b) => DirtyPaths();
+                UserPath.CollectionChanged   += (a, b) => DirtyPaths();
+            }
+        }
+
+        private IEnumerable<PathEntry> CurrentPath
+        {
+            get
+            {
+                lock(stateLock)
+                {
+                    return SystemPath.Concat(UserPath).Select(_ => _.Path);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Mark the paths as dirty and schedule a check operation
+        /// </summary>
+        /// <remarks>
+        /// (Done like this to prevent duplicate checks scheduled in the same event handler)
+        /// </remarks>
+        private void DirtyPaths()
+        {
+            pathsDirty = true;
+            Dispatcher.BeginInvoke((Action)RecheckPath);
+        }
+
+        private void RecheckPath()
+        {
+            if (pathsDirty)
+            {
+                pathsDirty = false;
+                checker.Check(SystemPath.Concat(UserPath));
+            }
         }
 
         private void Write()
@@ -44,25 +98,25 @@ namespace WindowsPathEditor
         }
 
         #region Dependency Properties
-        public ObservableCollection<PathEntry> SystemPath
+        public ObservableCollection<AnnotatedPathEntry> SystemPath
         {
-            get { return (ObservableCollection<PathEntry>)GetValue(SystemPathProperty); }
+            get { return (ObservableCollection<AnnotatedPathEntry>)GetValue(SystemPathProperty); }
             set { SetValue(SystemPathProperty, value); }
         }
 
         public static readonly DependencyProperty SystemPathProperty =
-            DependencyProperty.Register("SystemPath", typeof(ObservableCollection<PathEntry>),
-            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<PathEntry>()));
+            DependencyProperty.Register("SystemPath", typeof(ObservableCollection<AnnotatedPathEntry>),
+            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>()));
 
-        public ObservableCollection<PathEntry> UserPath
+        public ObservableCollection<AnnotatedPathEntry> UserPath
         {
-            get { return (ObservableCollection<PathEntry>)GetValue(UserPathProperty); }
+            get { return (ObservableCollection<AnnotatedPathEntry>)GetValue(UserPathProperty); }
             set { SetValue(UserPathProperty, value); }
         }
 
         public static readonly DependencyProperty UserPathProperty =
-            DependencyProperty.Register("UserPath", typeof(ObservableCollection<PathEntry>),
-            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<PathEntry>()));
+            DependencyProperty.Register("UserPath", typeof(ObservableCollection<AnnotatedPathEntry>),
+            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>()));
 
         public BitmapSource ShieldIcon
         {
@@ -75,5 +129,35 @@ namespace WindowsPathEditor
 
         #endregion
 
+        /// <summary>
+        /// Remove paths that don't exist or are listed multiple times
+        /// </summary>
+        private void Clean_Click(object sender, RoutedEventArgs e)
+        {
+            lock (stateLock)
+            {
+                var sp = SystemPath.Select(_ => _.Path);
+                var up = UserPath.Select(_ => _.Path);
+                var cp = sp.Concat(up);
+    
+                var s = sp.Where((p, index) => p.Exists && !sp.Take(index).Contains(p));
+                var u = up.Where((p, index) => p.Exists && !sp.Concat(up.Take(index)).Contains(p));
+
+                SetPaths(s, u);
+            }
+        }
+
+        public Func <IDataObject, object> FileDropConverter
+        {
+            get
+            {
+                return data => {
+                    var d = data as System.Windows.DataObject;
+                    if (d == null || !d.ContainsFileDropList() || d.GetFileDropList().Count == 0) return null;
+
+                    return new AnnotatedPathEntry(new PathEntry(d.GetFileDropList()[0]));
+                };
+            }
+        }
     }
 }

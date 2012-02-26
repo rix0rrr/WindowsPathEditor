@@ -7,11 +7,8 @@ using System.IO;
 
 namespace WindowsPathEditor
 {
-    public class PathEntry : INotifyPropertyChanged
+    public class PathEntry
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private List<string> issues = new List<string>();
-
         public PathEntry(string symbolicPath)
         {
             SymbolicPath = symbolicPath;
@@ -27,7 +24,7 @@ namespace WindowsPathEditor
         /// </summary>
         public string ActualPath 
         {
-            get { return Environment.ExpandEnvironmentVariables(SymbolicPath); }
+            get { return Path.GetFullPath(Environment.ExpandEnvironmentVariables(SymbolicPath)); }
         }
 
         /// <summary>
@@ -38,25 +35,32 @@ namespace WindowsPathEditor
             get { return Directory.Exists(ActualPath); }
         }
 
-        public bool HasIssues { get { return issues.Count() > 0; } }
-
-        /// <summary>
-        /// Return all issues with the PathEntry
-        /// </summary>
-        public IEnumerable<string> Issues { get { return issues.ToList(); } }
-
-        /// <summary>
-        /// Add an issue 
-        /// </summary>
-        public void AddIssue(string issue)
+        public IEnumerable<PathMatch> Find(string prefix)
         {
-            issues.Add(issue);
-            PropertyChanged.Notify(() => Issues);
+            try
+            {
+                return Directory.EnumerateFiles(ActualPath, prefix + "*")
+                    .Select(file => new PathMatch(ActualPath, Path.GetFileName(file)));
+            } catch (IOException)
+            {
+                return Enumerable.Empty<PathMatch>();
+            }
         }
 
         public override string ToString()
         {
             return SymbolicPath;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is PathEntry)) return false;
+            return ((PathEntry)obj).SymbolicPath.ToLower() == SymbolicPath.ToLower();
+        }
+
+        public override int GetHashCode()
+        {
+            return SymbolicPath.ToLower().GetHashCode();
         }
     }
 }

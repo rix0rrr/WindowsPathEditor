@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
+             ScrollViewer.CanContentScroll="False"
              d:DesignHeight="300" d:DesignWidth="300">
     <ListBox.Resources>
     </ListBox.Resources>
@@ -11,16 +12,19 @@
         <DataTemplate>
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                    <Image Name="indicatorImage" Source="/WindowsPathEditor;component/Resources/folder.png" />
+                    <Image Name="indicatorImage" Source="/WindowsPathEditor;component/Resources/accept.png" />
                     <TextBlock Text="{Binding SymbolicPath}" Margin="8,2,2,2"/>
                 </StackPanel>
-                <ItemsControl ItemsSource="{Binding Issues}" Foreground="Red" FontSize="10" Margin="24,0,0,0">
+                <ItemsControl ItemsSource="{Binding Issues}" Foreground="Crimson" FontSize="10" Margin="24,0,0,0">
                 </ItemsControl>
             </StackPanel>
 
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding HasIssues}" Value="True">
-                    <Setter TargetName="indicatorImage" Property="Source" Value="/WindowsPathEditor;component/Resources/folder_delete.png" />
+                <DataTrigger Binding="{Binding AlertLevel}" Value="1">
+                    <Setter TargetName="indicatorImage" Property="Source" Value="/WindowsPathEditor;component/Resources/error.png" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlertLevel}" Value="2">
+                    <Setter TargetName="indicatorImage" Property="Source" Value="/WindowsPathEditor;component/Resources/delete.png" />
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>

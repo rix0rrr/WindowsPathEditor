@@ -12,16 +12,16 @@ namespace WindowsPathEditor
     /// </summary>
     class PathRegistry
     {
-        private const string SystemPathSubKey = @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment";
-        private const string UserPathSubKey   = @"Environment";
+        private const string SystemEnvironmentKey = @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment";
+        private const string UserEnvironmentKey   = @"Environment";
 
         /// <summary>
         /// Access the System Path
         /// </summary>
         public IEnumerable<PathEntry> SystemPath
         {
-            get { return ReadPathFromRegistry(Registry.LocalMachine, SystemPathSubKey); }
-            set { WritePathToRegistry(Registry.LocalMachine, SystemPathSubKey, value); }
+            get { return ReadPathFromRegistry(Registry.LocalMachine, SystemEnvironmentKey); }
+            set { WritePathToRegistry(Registry.LocalMachine, SystemEnvironmentKey, value); }
         }
 
         /// <summary>
@@ -29,8 +29,19 @@ namespace WindowsPathEditor
         /// </summary>
         public IEnumerable<PathEntry> UserPath
         {
-            get { return ReadPathFromRegistry(Registry.CurrentUser, UserPathSubKey); }
-            set { WritePathToRegistry(Registry.CurrentUser, UserPathSubKey, value); }
+            get { return ReadPathFromRegistry(Registry.CurrentUser, UserEnvironmentKey); }
+            set { WritePathToRegistry(Registry.CurrentUser, UserEnvironmentKey, value); }
+        }
+
+        /// <summary>
+        /// Return a list of all command-line executable extensions 
+        /// </summary>
+        public IEnumerable<String> ExecutableExtensions
+        {
+            get {
+                return ReadMultipleFromRegistry(Registry.LocalMachine, SystemEnvironmentKey, "PathExt").Concat(
+                    ReadMultipleFromRegistry(Registry.CurrentUser, SystemEnvironmentKey, "PathExt"));
+            }
         }
 
         /// <summary>
@@ -42,7 +53,7 @@ namespace WindowsPathEditor
             {
                 try
                 {
-                    var k = Registry.LocalMachine.OpenSubKey(SystemPathSubKey, true);
+                    var k = Registry.LocalMachine.OpenSubKey(SystemEnvironmentKey, true);
                     if (k == null) return false;
                     k.Dispose();
                     return true;
@@ -56,12 +67,19 @@ namespace WindowsPathEditor
 
         private IEnumerable<PathEntry> ReadPathFromRegistry(RegistryKey rootKey, string key)
         {
+            return ReadMultipleFromRegistry(rootKey, key, "Path").Select(_ => new PathEntry(_));
+        }
+
+        private IEnumerable<string> ReadMultipleFromRegistry(RegistryKey rootKey, string key, string value)
+        {
             using (var k = rootKey.OpenSubKey(key, false))
             {
-                var reg = k.GetValue("Path", "", RegistryValueOptions.DoNotExpandEnvironmentNames) ?? "";
+                if (k == null) return Enumerable.Empty<string>();
+
+                var reg = k.GetValue(value, "", RegistryValueOptions.DoNotExpandEnvironmentNames) ?? "";
                 var path = reg is string ? (string)reg : "";
     
-                return path.Split(';').Where(_ => _ != "").Select(_ => new PathEntry(_));
+                return path.Split(';').Where(_ => _ != "");
             }
         }
 

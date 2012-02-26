@@ -60,23 +60,23 @@ namespace WindowsPathEditor.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap folder {
+        internal static System.Drawing.Bitmap accept {
             get {
-                object obj = ResourceManager.GetObject("folder", resourceCulture);
+                object obj = ResourceManager.GetObject("accept", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap folder_delete {
+        internal static System.Drawing.Bitmap delete {
             get {
-                object obj = ResourceManager.GetObject("folder_delete", resourceCulture);
+                object obj = ResourceManager.GetObject("delete", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap folder_error {
+        internal static System.Drawing.Bitmap error {
             get {
-                object obj = ResourceManager.GetObject("folder_error", resourceCulture);
+                object obj = ResourceManager.GetObject("error", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
