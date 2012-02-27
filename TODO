@@ -1,6 +1,6 @@
-- Recognize environment variables in dropped paths
 - Deleting (by dragging out...?)
 - Scan
 - UAC elevation
 - Saving
 - Disk scanning on background thread
+- Open in Explorer

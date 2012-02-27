@@ -155,7 +155,7 @@ namespace WindowsPathEditor
                     var d = data as System.Windows.DataObject;
                     if (d == null || !d.ContainsFileDropList() || d.GetFileDropList().Count == 0) return null;
 
-                    return new AnnotatedPathEntry(new PathEntry(d.GetFileDropList()[0]));
+                    return new AnnotatedPathEntry(checker.EntryFromFilePath(d.GetFileDropList()[0]));
                 };
             }
         }
