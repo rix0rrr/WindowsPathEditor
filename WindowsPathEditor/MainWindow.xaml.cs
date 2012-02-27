@@ -13,6 +13,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.IO;
+using System.Diagnostics;
 
 namespace WindowsPathEditor
 {
@@ -155,9 +157,40 @@ namespace WindowsPathEditor
                     var d = data as System.Windows.DataObject;
                     if (d == null || !d.ContainsFileDropList() || d.GetFileDropList().Count == 0) return null;
 
-                    return new AnnotatedPathEntry(checker.EntryFromFilePath(d.GetFileDropList()[0]));
+                    var path = d.GetFileDropList()[0];
+                    if (File.Exists(path)) path = System.IO.Path.GetDirectoryName(path);
+
+                    return new AnnotatedPathEntry(checker.EntryFromFilePath(path));
                 };
             }
+        }
+
+        private AnnotatedPathEntry GetSelectedEntry(RoutedEventArgs e)
+        {
+            if (systemList.IsFocused || e.Source == systemList) return systemList.SelectedItem as AnnotatedPathEntry;
+            if (userList.IsFocused || e.Source == userList) return userList.SelectedItem as AnnotatedPathEntry;
+            return null;
+        }
+
+        private void DoExplore(object sender, ExecutedRoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", "/e," + GetSelectedEntry(e).Path.ActualPath);
+        }
+
+        private void CanExplore(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = GetSelectedEntry(e) != null && Directory.Exists(GetSelectedEntry(e).Path.ActualPath);
+        }
+
+        private void DoDelete(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (systemList.IsFocused || e.Source == systemList) SystemPath.Remove(GetSelectedEntry(e));
+            if (userList.IsFocused || e.Source == userList) UserPath.Remove(GetSelectedEntry(e));
+        }
+
+        private void CanDelete(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = GetSelectedEntry(e) != null;
         }
     }
 }

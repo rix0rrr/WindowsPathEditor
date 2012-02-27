@@ -5,6 +5,25 @@
         xmlns:dd="clr-namespace:DragDropListBox"
         Title="Windows Path Editor" Height="464" Width="607" DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"
         Closed="Window_Closed">
+    <Window.Resources>
+        <ContextMenu x:Key="ContextMenu">
+            <MenuItem Command="Open">
+                <MenuItem.Icon>
+                    <Image Source="/WindowsPathEditor;component/Resources/folder_explore.png" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator />
+            <MenuItem Command="Delete">
+                <MenuItem.Icon>
+                    <Image Source="/WindowsPathEditor;component/Resources/cross.png" />
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" Executed="DoExplore" CanExecute="CanExplore"/>
+        <CommandBinding Command="Delete" Executed="DoDelete" CanExecute="CanDelete"/>
+    </Window.CommandBindings>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="374*" />
@@ -25,6 +44,8 @@
             <wpe:DirectoryList ItemsSource="{Binding Path=SystemPath}" Margin="4"
                                dd:DragDropHelper.IsDropTarget="true" dd:DragDropHelper.IsDragSource="true"
                                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
+                               ContextMenu="{DynamicResource ContextMenu}"
+                               x:Name="systemList"
                                />
         </GroupBox>
         <GridSplitter HorizontalAlignment="Stretch"
@@ -38,6 +59,8 @@
                   VerticalAlignment="Stretch">
             <wpe:DirectoryList ItemsSource="{Binding Path=UserPath}" Margin="4"
                                dd:DragDropHelper.IsDropTarget="true" dd:DragDropHelper.IsDragSource="true"
+                               ContextMenu="{DynamicResource ContextMenu}"
+                               x:Name="userList"
                                />
         </GroupBox>
         <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="3">
