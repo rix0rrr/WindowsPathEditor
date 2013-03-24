@@ -2,4 +2,3 @@
 - Disk scanning on background thread
 - Remove duplicates between SYSTEM and USER
 - Slow on many files
-- Hotkeys don't work (DEL)

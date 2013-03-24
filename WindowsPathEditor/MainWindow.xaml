@@ -31,6 +31,10 @@
         <CommandBinding Command="Delete" Executed="DoDelete" CanExecute="CanDelete"/>
         <CommandBinding Command="Save" Executed="DoSave" CanExecute="CanSave" />
     </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="Delete" Command="Delete" />
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
+    </Window.InputBindings>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="374*" />
@@ -53,7 +57,12 @@
                                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
                                ContextMenu="{DynamicResource ContextMenu}"
                                x:Name="systemList"
-                               />
+                               >
+                <wpe:DirectoryList.InputBindings>
+                    <KeyBinding Key="Delete" Command="Delete" />
+                    <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
+                </wpe:DirectoryList.InputBindings>
+            </wpe:DirectoryList>
         </GroupBox>
         <GridSplitter HorizontalAlignment="Stretch"
                       ResizeDirection="Rows"
@@ -68,8 +77,12 @@
                                dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
                                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
                                ContextMenu="{DynamicResource ContextMenu}"
-                               x:Name="userList"
-                               />
+                               x:Name="userList">
+                <wpe:DirectoryList.InputBindings>
+                    <KeyBinding Key="Delete" Command="Delete" />
+                    <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
+                </wpe:DirectoryList.InputBindings>
+            </wpe:DirectoryList>
         </GroupBox>
         <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="3">
             <TextBlock TextWrapping="WrapWithOverflow">Drag and drop to reorder.</TextBlock>
