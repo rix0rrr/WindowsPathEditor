@@ -16,7 +16,12 @@ namespace WindowsPathEditor
         /// <summary>
         /// The single thread that will be used to schedule all disk lookups
         /// </summary>
-        private EventLoopScheduler diskScheduler = new EventLoopScheduler(ts => new Thread(ts));
+        private Thread thread;
+
+        /// <summary>
+        /// The queue used to communicate with the background thread
+        /// </summary>
+        private BlockingCollection<IEnumerable<AnnotatedPathEntry>> pathsToProcess = new BlockingCollection<IEnumerable<AnnotatedPathEntry>>(new ConcurrentQueue<IEnumerable<AnnotatedPathEntry>>());
          
         /// <summary>
         /// Cache for the listFiles operation
@@ -33,9 +38,14 @@ namespace WindowsPathEditor
         /// </summary>
         private readonly IEnumerable<string> extensions;
 
+        private bool running           = true;
+        private bool abortCurrentCheck = false;
+
         public PathChecker(IEnumerable<string> extensions)
         {
             this.extensions = extensions.Concat(new[]{ ".dll" }).Select(_ => _.ToLower());
+            thread = new Thread(CheckerLoop);
+            thread.Start();
         }
 
         /// <summary>
@@ -44,20 +54,52 @@ namespace WindowsPathEditor
         public void Check(IEnumerable<AnnotatedPathEntry> paths)
         {
             currentPath = paths.Select(_ => _.Path);
+            abortCurrentCheck = true;
+            pathsToProcess.Add(paths);
+        }
 
+        /// <summary>
+        /// Method to do the actual checking (call from thread)
+        /// </summary>
+        /// <param name="paths"></param>
+        private void DoCheck(IEnumerable<AnnotatedPathEntry> paths)
+        {
             foreach (var path in paths)
             {
-                path.ClearIssues();
-                if (!path.Path.Exists)
-                {
-                    path.AddIssue("Does not exist");
-                    return;
-                }
+                if (abortCurrentCheck) return;
 
-                var shadowed = Observable.ToObservable(listFiles(path.Path.ActualPath))
-                    .Select(file => new { file=file, hit=FirstDir(file)})
-                    .Where(fh => fh.hit.Directory.ToLower() != path.Path.ActualPath.ToLower())
-                    .Subscribe(fh => path.AddIssue(string.Format("{0} shadowed by {1}", fh.file, fh.hit.FullPath)));
+                CheckPath(path);
+            }
+        }
+
+        private void CheckPath(AnnotatedPathEntry path)
+        {
+            path.ClearIssues();
+            if (!path.Path.Exists)
+            {
+                path.AddIssue("Does not exist");
+                return;
+            }
+
+            listFiles(path.Path.ActualPath)
+                .Select(file => new { file=file, hit=FirstDir(file)})
+                .Where(fh => fh.hit.Directory.ToLower() != path.Path.ActualPath.ToLower())
+                .Each(fh => path.AddIssue(string.Format("{0} shadowed by {1}", fh.file, fh.hit.FullPath)));
+        }
+
+        /// <summary>
+        /// The background thread that will do the checking of the current path
+        /// </summary>
+        private void CheckerLoop()
+        {
+            while (running) 
+            {
+                IEnumerable<AnnotatedPathEntry> subject = pathsToProcess.Take();
+                if (subject != null)
+                {
+                    abortCurrentCheck = false;
+                    DoCheck(subject);
+                }
             }
         }
 
@@ -90,7 +132,7 @@ namespace WindowsPathEditor
 
 
         /// <summary>
-        /// List all files in a directory, returning them from cache if available
+        /// List all files in a directory, returning them from cache if available to speed up subsequent searches
         /// </summary>
         private IEnumerable<string> listFiles(string path)
         {
@@ -117,12 +159,10 @@ namespace WindowsPathEditor
         /// </summary>
         private PathMatch FirstDir(string filename)
         {
-            foreach (var path in currentPath)
-            {
-                if (File.Exists(Path.Combine(path.ActualPath, filename)))
-                    return new PathMatch(path.ActualPath, filename);
-            }
-            return new PathMatch("", "");
+            return currentPath
+                .Where(path => File.Exists(Path.Combine(path.ActualPath, filename)))
+                .Select(path => new PathMatch(path.ActualPath, filename))
+                .FirstOrDefault() ?? new PathMatch("", "");
         }
 
         /// <summary>
@@ -145,7 +185,9 @@ namespace WindowsPathEditor
 
         public void Dispose()
         {
-            diskScheduler.Dispose();
+            running = false;
+            pathsToProcess.Add(null);
+            thread.Join();
         }
     }
 
