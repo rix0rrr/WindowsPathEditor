@@ -5,6 +5,9 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using System.Diagnostics;
+using System.Reflection;
+using System.ComponentModel;
 
 namespace WindowsPathEditor
 {
@@ -41,6 +44,35 @@ namespace WindowsPathEditor
             }
         }
 
+        /// <summary>
+        /// Elevate the privileges of the current process
+        /// </summary>
+        public static bool Relaunch(string arguments, bool elevated)
+        {
+            ProcessStartInfo info = new ProcessStartInfo();
+            info.FileName = Assembly.GetEntryAssembly().GetName().CodeBase;
+            info.Arguments = arguments;
+
+            if (elevated)
+            {
+                info.UseShellExecute = true;
+                info.Verb = "runas"; // Provides Run as Administrator
+            }
+            
+            try
+            {
+                Process p = Process.Start(info);
+                p.WaitForExit(10000);
+                if (!p.HasExited)
+                {
+                    p.Kill();
+                    return false;
+                }
+                return p.ExitCode == 0;
+            } catch (Win32Exception) {
+                return false;
+            }
+        }
 
         [DllImport("Shell32.dll", SetLastError = false)]
         public static extern Int32 SHGetStockIconInfo(SHSTOCKICONID siid, SHGSI uFlags, ref SHSTOCKICONINFO psii);
@@ -169,5 +201,6 @@ namespace WindowsPathEditor
             SIID_CLUSTEREDDRIVE = 140,
             SIID_MAX_ICONS = 175
         }
+
     }
 }

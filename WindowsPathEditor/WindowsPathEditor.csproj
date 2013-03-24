@@ -66,6 +66,7 @@
     <Compile Include="AutoCompleteBox.xaml.cs">
       <DependentUpon>AutoCompleteBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InvertBooleanConverter.cs" />
     <Compile Include="PathChecker.cs" />
     <Compile Include="DragDropListBox\DragDropHelper.cs" />
     <Compile Include="DragDropListBox\DraggedAdorner.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="DragDropListBox\Utilities.cs" />
     <Compile Include="PathMatch.cs" />
     <Compile Include="UAC.cs" />
+    <Compile Include="ValueConverterGroup.cs" />
     <Page Include="AutoCompleteBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

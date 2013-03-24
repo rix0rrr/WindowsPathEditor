@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wpe="clr-namespace:WindowsPathEditor"
         xmlns:dd="clr-namespace:DragDropListBox"
-        Title="Windows Path Editor" Height="464" Width="607" DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"
+        Title="Windows Path Editor" Height="495" Width="607" DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"
         Closed="Window_Closed">
     <Window.Resources>
         <ContextMenu x:Key="ContextMenu">
@@ -19,10 +19,17 @@
                 </MenuItem.Icon>
             </MenuItem>
         </ContextMenu>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrue" />
+        <wpe:InvertBooleanConverter x:Key="Invert" />
+        <wpe:ValueConverterGroup x:Key="VisibleIfFalse">
+            <wpe:InvertBooleanConverter />
+            <BooleanToVisibilityConverter />
+        </wpe:ValueConverterGroup>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="Open" Executed="DoExplore" CanExecute="CanExplore"/>
         <CommandBinding Command="Delete" Executed="DoDelete" CanExecute="CanDelete"/>
+        <CommandBinding Command="Save" Executed="DoSave" CanExecute="CanSave" />
     </Window.CommandBindings>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -42,7 +49,7 @@
                   Margin="0,0,0,10"
                   Grid.Row="1">
             <wpe:DirectoryList ItemsSource="{Binding Path=SystemPath}" Margin="4"
-                               dd:DragDropHelper.IsDropTarget="true" dd:DragDropHelper.IsDragSource="true"
+                               dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
                                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
                                ContextMenu="{DynamicResource ContextMenu}"
                                x:Name="systemList"
@@ -58,14 +65,15 @@
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch">
             <wpe:DirectoryList ItemsSource="{Binding Path=UserPath}" Margin="4"
-                               dd:DragDropHelper.IsDropTarget="true" dd:DragDropHelper.IsDragSource="true"
+                               dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
+                               dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
                                ContextMenu="{DynamicResource ContextMenu}"
                                x:Name="userList"
                                />
         </GroupBox>
         <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="3">
-            <TextBlock TextWrapping="WrapWithOverflow" FontSize="16">Drag and drop to reorder.</TextBlock>
-            <TextBlock TextWrapping="WrapWithOverflow" FontSize="16">Drag from Explorer to add.</TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow">Drag and drop to reorder.</TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow">Drag from Explorer to add.</TextBlock>
 
             <Border Height="40" />
 
@@ -79,12 +87,10 @@
 
             <Border Height="20" />
 
-            <Button Height="24" Content="Save Changes" Margin="10" />
-
-            <Button Height="24" Margin="10">
+            <Button Margin="10" Command="Save">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="{Binding ShieldIcon}" />
-                    <TextBlock>Edit System</TextBlock>
+                    <Image Source="{Binding ShieldIcon}" Visibility="{Binding NeedsElevation, Converter={StaticResource VisibleIfTrue}}"/>
+                    <TextBlock>Save</TextBlock>
                 </StackPanel>
             </Button>
         </StackPanel>

@@ -15,13 +15,15 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Interop;
+using System.ComponentModel;
 
 namespace WindowsPathEditor
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private readonly PathRegistry reg = new PathRegistry();
         private readonly PathChecker checker;
@@ -36,12 +38,37 @@ namespace WindowsPathEditor
             ShieldIcon = UAC.GetShieldIcon();
             searchBox.SetCompleteProvider(checker.Search);
 
-            Read();
+            var args = Environment.GetCommandLineArgs();
+            if (args.Count() > 1)
+            {
+                WriteChangesFromCommandLine(args.Skip(1));
+                Close();
+            }
+            else
+                Read();
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
             checker.Dispose();
+        }
+
+        /// <summary>
+        /// Write the changes passed on the command-line (used for writing with UAC elevation)
+        /// </summary>
+        private void WriteChangesFromCommandLine(IEnumerable<string> args)
+        {
+            for (int i = 0; i < args.Count(); i++)
+            {
+                if (args.ElementAt(i).ToLower() == "/system") {
+                    reg.SystemPath = ParseCommandLinePath(args.ElementAt(i + 1));
+                    i++;
+                }
+                if (args.ElementAt(i).ToLower() == "/user") {
+                    reg.UserPath = ParseCommandLinePath(args.ElementAt(i + 1));
+                    i++;
+                }
+            }
         }
 
         private void Read()
@@ -83,6 +110,7 @@ namespace WindowsPathEditor
         private void DirtyPaths()
         {
             pathsDirty = true;
+            InvalidateDependentProperties();
             Dispatcher.BeginInvoke((Action)RecheckPath);
         }
 
@@ -91,12 +119,31 @@ namespace WindowsPathEditor
             if (pathsDirty)
             {
                 pathsDirty = false;
-                checker.Check(SystemPath.Concat(UserPath));
+                checker.Check(CompletePath);
             }
         }
 
         private void Write()
         {
+            string args = "";
+            if (SystemPathChanged) args += "/system " + PathAsCommandLineArgument(SystemPath);
+            if (UserPathChanged) args += "/user " + PathAsCommandLineArgument(UserPath);
+
+            if (!UAC.Relaunch(args, NeedsElevation))
+                MessageBox.Show("The changes were NOT saved!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+                Read();
+        }
+
+        /// <summary>
+        /// The complete path as it would be searched by Windows
+        /// </summary>
+        /// <remarks>
+        /// First the SYSTEM entries are searched, then the USER entries.
+        /// </remarks>
+        private IEnumerable<AnnotatedPathEntry> CompletePath
+        {
+            get { return SystemPath.Concat(UserPath); }
         }
 
         #region Dependency Properties
@@ -108,7 +155,8 @@ namespace WindowsPathEditor
 
         public static readonly DependencyProperty SystemPathProperty =
             DependencyProperty.Register("SystemPath", typeof(ObservableCollection<AnnotatedPathEntry>),
-            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>()));
+            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>(),
+                (obj, e) => { ((MainWindow)obj).InvalidateDependentProperties(); }));
 
         public ObservableCollection<AnnotatedPathEntry> UserPath
         {
@@ -118,7 +166,8 @@ namespace WindowsPathEditor
 
         public static readonly DependencyProperty UserPathProperty =
             DependencyProperty.Register("UserPath", typeof(ObservableCollection<AnnotatedPathEntry>),
-            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>()));
+            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>(),
+                (obj, e) => { ((MainWindow)obj).InvalidateDependentProperties(); }));
 
         public BitmapSource ShieldIcon
         {
@@ -129,7 +178,43 @@ namespace WindowsPathEditor
         public static readonly DependencyProperty ShieldIconProperty =
             DependencyProperty.Register("ShieldIcon", typeof(BitmapSource), typeof(MainWindow), new UIPropertyMetadata(null));
 
+        public bool NeedsElevation
+        {
+            get { return !reg.IsSystemPathWritable && SystemPathChanged; }
+        }
+
         #endregion
+
+        /// <summary>
+        /// Called when the user has changed the path lists, to force WPF to reevaluate properties that depend on the lists
+        /// </summary>
+        private void InvalidateDependentProperties()
+        {
+            var changed = PropertyChanged;
+            if (changed == null) return;
+
+            changed(this, new PropertyChangedEventArgs("SystemPathChanged"));
+            changed(this, new PropertyChangedEventArgs("UserPathChanged"));
+            changed(this, new PropertyChangedEventArgs("NeedsElevation"));
+        }
+
+        private bool SystemPathChanged
+        {
+            get { return !PathListEqual(reg.SystemPath, SystemPath); }
+        }
+
+        private bool UserPathChanged
+        {
+            get { return !PathListEqual(reg.UserPath, UserPath); }
+        }
+
+        /// <summary>
+        /// Compare two path lists
+        /// </summary>
+        private bool PathListEqual(IEnumerable<PathEntry> original,ObservableCollection<AnnotatedPathEntry> edited)
+        {
+            return original.Count() == edited.Count() && original.Zip(edited, (a, b) => a.SymbolicPath == b.SymbolicPath).All(_ => _);
+        }
 
         /// <summary>
         /// Remove paths that don't exist or are listed multiple times
@@ -191,6 +276,28 @@ namespace WindowsPathEditor
         private void CanDelete(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = GetSelectedEntry(e) != null;
+        }
+
+        private string PathAsCommandLineArgument(IEnumerable<AnnotatedPathEntry> path)
+        {
+            return "\"" + string.Join(";", path) + "\"";
+        }
+
+        private IEnumerable<PathEntry> ParseCommandLinePath(string argument)
+        {
+            return argument.Split(';').Select(path => new PathEntry(path));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void DoSave(object sender, ExecutedRoutedEventArgs e)
+        {
+            Write();
+        }
+
+        private void CanSave(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = UserPathChanged || SystemPathChanged;
         }
     }
 }
