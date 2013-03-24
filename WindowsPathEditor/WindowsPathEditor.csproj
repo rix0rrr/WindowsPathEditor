@@ -67,12 +67,17 @@
       <DependentUpon>AutoCompleteBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="InvertBooleanConverter.cs" />
+    <Compile Include="IReportProgress.cs" />
     <Compile Include="PathChecker.cs" />
     <Compile Include="DragDropListBox\DragDropHelper.cs" />
     <Compile Include="DragDropListBox\DraggedAdorner.cs" />
     <Compile Include="DragDropListBox\InsertionAdorner.cs" />
     <Compile Include="DragDropListBox\Utilities.cs" />
     <Compile Include="PathMatch.cs" />
+    <Compile Include="ScanningWindow.xaml.cs">
+      <DependentUpon>ScanningWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SearchOperation.cs" />
     <Compile Include="UAC.cs" />
     <Compile Include="ValueConverterGroup.cs" />
     <Page Include="AutoCompleteBox.xaml">
@@ -99,6 +104,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ScanningWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PathEntry.cs" />

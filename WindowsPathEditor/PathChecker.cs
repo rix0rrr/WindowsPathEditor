@@ -165,24 +165,6 @@ namespace WindowsPathEditor
                 .FirstOrDefault() ?? new PathMatch("", "");
         }
 
-        /// <summary>
-        /// Try to find an environment variable that matches part of the path and
-        /// return that, otherwise return a normal path entry.
-        /// </summary>
-        public PathEntry EntryFromFilePath(string path)
-        {
-            foreach (var de in Environment.GetEnvironmentVariables())
-            {
-                var e = (DictionaryEntry)de;
-                var value = (string)e.Value;
-                if (value != "" && Directory.Exists(value) && path.StartsWith(value))
-                {
-                    return new PathEntry("%" + e.Key + "%" + path.Substring(value.Length));
-                }
-            }
-            return new PathEntry(path);
-        }
-
         public void Dispose()
         {
             running = false;

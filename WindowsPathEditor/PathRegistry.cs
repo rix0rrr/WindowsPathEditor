@@ -15,6 +15,8 @@ namespace WindowsPathEditor
         private const string SystemEnvironmentKey = @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment";
         private const string UserEnvironmentKey   = @"Environment";
 
+        private bool? systemPathWritable;
+
         /// <summary>
         /// Access the System Path
         /// </summary>
@@ -51,17 +53,23 @@ namespace WindowsPathEditor
         {
             get
             {
-                try
-                {
-                    var k = Registry.LocalMachine.OpenSubKey(SystemEnvironmentKey, true);
-                    if (k == null) return false;
-                    k.Dispose();
-                    return true;
-                } 
-                catch (SecurityException)
-                {
-                    return false;
+                if (!systemPathWritable.HasValue) {
+                    try
+                    {
+                        var k = Registry.LocalMachine.OpenSubKey(SystemEnvironmentKey, true);
+                        if (k == null) {
+                            systemPathWritable = false;
+                            return false;
+                        }
+                        k.Dispose();
+                        systemPathWritable = true;
+                    } 
+                    catch (SecurityException)
+                    {
+                        systemPathWritable = false;
+                    }
                 }
+                return systemPathWritable.Value;
             }
         }
 

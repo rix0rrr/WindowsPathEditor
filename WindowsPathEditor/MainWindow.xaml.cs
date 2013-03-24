@@ -17,6 +17,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Interop;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace WindowsPathEditor
 {
@@ -247,7 +248,7 @@ namespace WindowsPathEditor
                     var path = d.GetFileDropList()[0];
                     if (File.Exists(path)) path = System.IO.Path.GetDirectoryName(path);
 
-                    return new AnnotatedPathEntry(checker.EntryFromFilePath(path));
+                    return new AnnotatedPathEntry(PathEntry.FromFilePath(path));
                 };
             }
         }
@@ -300,6 +301,23 @@ namespace WindowsPathEditor
         private void CanSave(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = UserPathChanged || SystemPathChanged;
+        }
+
+        private void Scan_Click(object sender, RoutedEventArgs e)
+        {
+            var currentPaths = CompletePath.Select(_ => _.Path);
+            var search = new SearchOperation("C:\\", 4, new ScanningWindow());
+
+            Task<IEnumerable<string>>.Factory.StartNew(search.Run).ContinueWith(task => {
+                if (task.IsFaulted) return; // Too bad
+
+                var binDirectories = task.Result;
+    
+                binDirectories
+                    .Select(PathEntry.FromFilePath)
+                    .Where(path => !currentPaths.Contains(path))
+                    .Each(path => UserPath.Add(new AnnotatedPathEntry(path)));
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
 }

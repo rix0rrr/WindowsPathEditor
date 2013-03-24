@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.IO;
+using System.Collections;
 
 namespace WindowsPathEditor
 {
@@ -62,5 +63,45 @@ namespace WindowsPathEditor
         {
             return ActualPath.ToLower().GetHashCode();
         }
+
+        private static IEnumerable<DictionaryEntry> environment;
+
+        /// <summary>
+        /// Try to find an environment variable that matches part of the path and
+        /// return that, otherwise return a normal path entry.
+        /// </summary>
+        /// <remarks>
+        /// Be sure to return the longest possible entry, but don't include entries
+        /// of fewer than 4 characters (this is to avoid returning %HOMEDRIVE% all the
+        /// time, because that one is fairly uninteresting and confusing).
+        /// </remarks>
+        public static PathEntry FromFilePath(string path)
+        {
+            if (environment == null)
+            {
+                environment = GetEnvironment()
+                    .Where(entry => ((string)entry.Value).Length > 3)
+                    .OrderBy(entry => -((string)entry.Value).Length).ToList();
+            }
+
+            foreach (var e in environment)
+            {
+                var value = (string)e.Value;
+                if (value != "" && Directory.Exists(value) && path.StartsWith(value))
+                {
+                    return new PathEntry("%" + e.Key + "%" + path.Substring(value.Length));
+                }
+            }
+            return new PathEntry(path);
+        }
+
+        private static IEnumerable<DictionaryEntry> GetEnvironment()
+        {
+            var ls = new List<DictionaryEntry>();
+            foreach (var entry in Environment.GetEnvironmentVariables())
+                ls.Add((DictionaryEntry)entry);
+            return ls;
+        }
+
     }
 }

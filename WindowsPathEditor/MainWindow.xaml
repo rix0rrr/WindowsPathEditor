@@ -4,6 +4,7 @@
         xmlns:wpe="clr-namespace:WindowsPathEditor"
         xmlns:dd="clr-namespace:DragDropListBox"
         Title="Windows Path Editor" Height="495" Width="607" DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"
+        WindowStartupLocation="CenterScreen"
         Closed="Window_Closed">
     <Window.Resources>
         <ContextMenu x:Key="ContextMenu">
@@ -56,6 +57,7 @@
                                dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
                                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
                                ContextMenu="{DynamicResource ContextMenu}"
+                               ShowIssues="{Binding ElementName=ShowIssues, Path=IsChecked}"
                                x:Name="systemList"
                                >
                 <wpe:DirectoryList.InputBindings>
@@ -77,6 +79,7 @@
                                dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
                                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
                                ContextMenu="{DynamicResource ContextMenu}"
+                               ShowIssues="{Binding ElementName=ShowIssues, Path=IsChecked}"
                                x:Name="userList">
                 <wpe:DirectoryList.InputBindings>
                     <KeyBinding Key="Delete" Command="Delete" />
@@ -85,25 +88,37 @@
             </wpe:DirectoryList>
         </GroupBox>
         <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="3">
-            <TextBlock TextWrapping="WrapWithOverflow">Drag and drop to reorder.</TextBlock>
-            <TextBlock TextWrapping="WrapWithOverflow">Drag from Explorer to add.</TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow">Drag and drop to reorder. Drag from Explorer to add.</TextBlock>
 
-            <Border Height="40" />
-
-            <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center">Remove nonexistant and duplicates.</TextBlock>
-            <Button Height="24" Content="Clean up" Margin="10" Click="Clean_Click"/>
+            <Border Height="30"></Border>
+            <CheckBox Content="Show problems" Height="16" Name="ShowIssues" IsChecked="False" />
+            <Border Height="30">
+            </Border>
+            <Button Click="Clean_Click" Padding="0,5">
+                <StackPanel>
+                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold">Clean Up</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Remove nonexistant and duplicates.</TextBlock>
+                </StackPanel>
+            </Button>
 
             <Border Height="20" />
 
-            <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center">Search C: for 'bin' directories.</TextBlock>
-            <Button Height="24" Content="Scan" Margin="10" />
+            <Button Padding="0,5" Click="Scan_Click">
+                <StackPanel>
+                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold">Automatic</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Search C:\ for directories called "bin".</TextBlock>
+                </StackPanel>
+            </Button>
 
             <Border Height="20" />
 
-            <Button Margin="10" Command="Save">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="{Binding ShieldIcon}" Visibility="{Binding NeedsElevation, Converter={StaticResource VisibleIfTrue}}"/>
-                    <TextBlock>Save</TextBlock>
+            <Button Command="Save">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Image Source="{Binding ShieldIcon}" Visibility="{Binding NeedsElevation, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,5,0"/>
+                        <TextBlock FontWeight="Bold">Save</TextBlock>
+                    </StackPanel>
+                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Write changes to registry.</TextBlock>
                 </StackPanel>
             </Button>
         </StackPanel>

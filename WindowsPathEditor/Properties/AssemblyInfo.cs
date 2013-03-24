@@ -7,12 +7,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("WindowsPathEditor")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Windows Path Editor")]
+[assembly: AssemblyDescription("Application for easily editing the Windows PATH")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("WindowsPathEditor")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2012")]
+[assembly: AssemblyCompany("Rico Huijbers")]
+[assembly: AssemblyProduct("Windows Path Editor")]
+[assembly: AssemblyCopyright("© 2013 Rico Huijbers")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

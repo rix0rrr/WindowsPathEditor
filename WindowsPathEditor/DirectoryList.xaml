@@ -7,6 +7,9 @@
              mc:Ignorable="d" 
              ScrollViewer.CanContentScroll="False"
              d:DesignHeight="300" d:DesignWidth="300">
+    <ListBox.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrue" />
+    </ListBox.Resources>
     <ListBox.ItemTemplate>
         <DataTemplate>
             <StackPanel Orientation="Vertical">
@@ -14,7 +17,8 @@
                     <Image Name="indicatorImage" Source="/WindowsPathEditor;component/Resources/accept.png" />
                     <TextBlock Text="{Binding SymbolicPath}" Margin="8,2,2,2"/>
                 </StackPanel>
-                <ItemsControl ItemsSource="{Binding Issues}" Foreground="Crimson" FontSize="10" Margin="24,0,0,0">
+                <ItemsControl ItemsSource="{Binding Issues}" Foreground="Crimson" FontSize="10" Margin="24,0,0,0"
+                Visibility="{Binding ShowIssues, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type wpe:DirectoryList}}, Converter={StaticResource VisibleIfTrue}}">
                 </ItemsControl>
             </StackPanel>
 
