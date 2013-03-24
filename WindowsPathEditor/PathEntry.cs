@@ -24,7 +24,7 @@ namespace WindowsPathEditor
         /// </summary>
         public string ActualPath 
         {
-            get { return Path.GetFullPath(Environment.ExpandEnvironmentVariables(SymbolicPath)); }
+            get { return Path.GetFullPath(Environment.ExpandEnvironmentVariables(SymbolicPath)).TrimEnd('\\'); }
         }
 
         /// <summary>
@@ -55,12 +55,12 @@ namespace WindowsPathEditor
         public override bool Equals(object obj)
         {
             if (!(obj is PathEntry)) return false;
-            return ((PathEntry)obj).SymbolicPath.ToLower() == SymbolicPath.ToLower();
+            return ((PathEntry)obj).ActualPath.ToLower() == ActualPath.ToLower();
         }
 
         public override int GetHashCode()
         {
-            return SymbolicPath.ToLower().GetHashCode();
+            return ActualPath.ToLower().GetHashCode();
         }
     }
 }

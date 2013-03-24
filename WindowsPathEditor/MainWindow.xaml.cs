@@ -25,6 +25,8 @@ namespace WindowsPathEditor
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public static RoutedCommand CleanUp = new RoutedCommand();
+
         private readonly PathRegistry reg = new PathRegistry();
         private readonly PathChecker checker;
         private readonly object stateLock = new object();
@@ -228,7 +230,7 @@ namespace WindowsPathEditor
                 var cp = sp.Concat(up);
     
                 var s = sp.Where((p, index) => p.Exists && !sp.Take(index).Contains(p));
-                var u = up.Where((p, index) => p.Exists && !sp.Concat(up.Take(index)).Contains(p));
+                var u = up.Where((p, index) => p.Exists && !cp.Take(sp.Count() + index).Contains(p));
 
                 SetPaths(s, u);
             }

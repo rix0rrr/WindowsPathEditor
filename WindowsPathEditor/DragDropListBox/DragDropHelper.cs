@@ -383,7 +383,7 @@ namespace DragDropListBox
 		// Creates or updates the dragged Adorner. 
 		private void ShowDraggedAdorner(Point currentPosition)
 		{
-			if (this.draggedAdorner == null && sourceItemsControl != null)
+			if (this.draggedAdorner == null && sourceItemsControl != null && sourceItemContainer != null)
 			{
 				var adornerLayer = AdornerLayer.GetAdornerLayer(this.sourceItemsControl);
 				this.draggedAdorner = new DraggedAdorner(this.draggedData, GetDragDropTemplate(this.sourceItemsControl), this.sourceItemContainer, adornerLayer);
