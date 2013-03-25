@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.Win32;
 using System.Security;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace WindowsPathEditor
 {
@@ -98,6 +100,45 @@ namespace WindowsPathEditor
                 var reg = string.Join(";", path.Select(_ => _.SymbolicPath));
                 k.SetValue("Path", reg, RegistryValueKind.ExpandString);
             }
+            KickExplorer();
+        }
+
+        /// <summary>
+        /// Give explorer and other programs a sign that the environment vars got updated
+        /// </summary>
+        /// <remarks>
+        /// Explorer caches the environment vars internally. Without this signal,
+        /// they won't get reread from the registry.
+        /// </remarks>
+        private static void KickExplorer() 
+        {
+            UIntPtr retVal;
+            IntPtr HWND_BROADCAST = new IntPtr(0xffff);
+
+            if (IntPtr.Zero == SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, UIntPtr.Zero, "Environment", SendMessageTimeoutFlags.SMTO_ABORTIFHUNG, 5000, out retVal))
+                throw new Win32Exception();
+        }
+
+
+        [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
+        private static extern IntPtr SendMessageTimeout(
+            IntPtr hWnd,
+            uint Msg, 
+            UIntPtr wParam,
+            string lParam, 
+            SendMessageTimeoutFlags fuFlags, 
+            uint uTimeout, 
+            out UIntPtr lpdwResult);
+
+        private const uint WM_SETTINGCHANGE = 0x1A;
+
+        [Flags]
+        enum SendMessageTimeoutFlags : uint
+        {
+            SMTO_NORMAL             = 0x0,
+            SMTO_BLOCK              = 0x1,
+            SMTO_ABORTIFHUNG        = 0x2,
+            SMTO_NOTIMEOUTIFNOTHUNG = 0x8
         }
     }
 }
