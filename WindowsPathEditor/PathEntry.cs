@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.IO;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace WindowsPathEditor
 {
@@ -12,7 +13,17 @@ namespace WindowsPathEditor
     {
         public PathEntry(string symbolicPath)
         {
-            SymbolicPath = symbolicPath;
+            SymbolicPath = symbolicPath
+                .Replace('/', '\\');
+
+            var invalidChars = new Regex("[" + Regex.Escape(string.Join("", Path.GetInvalidPathChars())) + "]");
+            SymbolicPath = invalidChars.Replace(SymbolicPath, "");
+
+            var stripLaterColons = new Regex("^(.*:.*):");
+            while (stripLaterColons.IsMatch(SymbolicPath))
+            {
+                SymbolicPath = stripLaterColons.Replace(SymbolicPath, "$1");
+            }
         }
 
         /// <summary>

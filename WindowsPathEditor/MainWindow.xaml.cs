@@ -130,7 +130,7 @@ namespace WindowsPathEditor
         {
             string args = "";
             if (SystemPathChanged) args += "/system " + PathAsCommandLineArgument(SystemPath);
-            if (UserPathChanged) args += "/user " + PathAsCommandLineArgument(UserPath);
+            if (UserPathChanged) args += " /user " + PathAsCommandLineArgument(UserPath);
 
             if (!UAC.Relaunch(args, NeedsElevation))
                 MessageBox.Show("The changes were NOT saved!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
