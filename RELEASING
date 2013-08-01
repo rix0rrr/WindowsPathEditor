@@ -5,5 +5,5 @@
 - Update README.md w/ new version link
 - Commit, Tag
 - Switch to gh-pages branch
-- Edit index.html, link to new version
-- Push
+- Edit index.html, link to new version (in 2 places!)
+- Push (both branches!)
