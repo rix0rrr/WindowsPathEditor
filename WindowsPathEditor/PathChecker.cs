@@ -53,9 +53,9 @@ namespace WindowsPathEditor
         /// </summary>
         public void Check(IEnumerable<AnnotatedPathEntry> paths)
         {
-            currentPath = paths.Select(_ => _.Path);
+            currentPath = paths.Select(_ => _.Path).ToList();
             abortCurrentCheck = true;
-            pathsToProcess.Add(paths);
+            pathsToProcess.Add(paths.ToList());
         }
 
         /// <summary>
