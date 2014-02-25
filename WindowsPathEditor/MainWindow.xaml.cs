@@ -326,5 +326,14 @@ namespace WindowsPathEditor
                     .Each(path => UserPath.Add(new AnnotatedPathEntry(path)));
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
+
+        private void AddNew(object sender, RoutedEventArgs e)
+        {
+            var filledPath = addBox.Text;
+            if (filledPath != "")
+            {
+                UserPath.Add(new AnnotatedPathEntry(new PathEntry(filledPath)));
+            }
+        }
     }
 }
