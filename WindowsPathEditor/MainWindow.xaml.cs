@@ -32,6 +32,16 @@ namespace WindowsPathEditor
             ShieldIcon = UAC.GetShieldIcon();
             searchBox.SetCompleteProvider(checker.Search);
 
+            var AllDrives = DriveInfo.GetDrives();
+            foreach (DriveInfo Drive in AllDrives)
+            {
+                if (Drive.DriveType == DriveType.Fixed)
+                {
+                    DiskSelection.Items.Add(Drive.Name);
+                }
+            }
+            DiskSelection.SelectedIndex = 0;
+
             var args = Environment.GetCommandLineArgs();
             if (args.Count() > 1)
             {
@@ -301,7 +311,8 @@ namespace WindowsPathEditor
         private void Scan_Click(object sender, RoutedEventArgs e)
         {
             var currentPaths = CompletePath.Select(_ => _.Path);
-            var search = new SearchOperation("C:\\", 4, new ScanningWindow());
+            var selectedDisk = DiskSelection.Text;
+            var search = new SearchOperation(selectedDisk, 4, new ScanningWindow());
 
             Task<IEnumerable<string>>.Factory.StartNew(search.Run).ContinueWith(task =>
             {

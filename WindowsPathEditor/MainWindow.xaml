@@ -101,7 +101,8 @@
             <Border Height="20" />
             <Button Click="Scan_Click" Content="Automatic" Padding="0,3"></Button>
             <StackPanel>
-                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,0"><Run Text="Search C:\ for directories called &quot;bin&quot;."/></TextBlock>
+                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,0"><Run Text="Search for directories called &quot;bin&quot; in this disk:"/></TextBlock>
+                <ComboBox x:Name="DiskSelection" />
             </StackPanel>
             <Border Height="20" />
             <Button Command="Save" Padding="0,3">
