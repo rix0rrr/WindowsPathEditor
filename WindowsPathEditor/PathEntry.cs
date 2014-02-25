@@ -63,12 +63,6 @@ namespace WindowsPathEditor
             return SymbolicPath;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (!(obj is PathEntry)) return false;
-            return ((PathEntry)obj).ActualPath.ToLower() == ActualPath.ToLower();
-        }
-
         public override int GetHashCode()
         {
             return ActualPath.ToLower().GetHashCode();
