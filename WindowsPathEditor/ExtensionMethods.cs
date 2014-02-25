@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using System.Linq.Expressions;
 
@@ -40,14 +38,14 @@ namespace WindowsPathEditor
             {
                 throw new ArgumentException("Lambda must return a property.");
             }
-         
+
             var vmExpression = body.Expression as ConstantExpression;
             if (vmExpression != null)
             {
                 LambdaExpression lambda = Expression.Lambda(vmExpression);
                 Delegate vmFunc = lambda.Compile();
                 object sender = vmFunc.DynamicInvoke();
-         
+
                 if (handler != null)
                 {
                     handler(sender, new PropertyChangedEventArgs(body.Member.Name));

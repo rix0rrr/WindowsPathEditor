@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.Concurrent;
-using System.Threading;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using System.IO;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
 
 namespace WindowsPathEditor
 {
@@ -22,11 +19,11 @@ namespace WindowsPathEditor
         /// The queue used to communicate with the background thread
         /// </summary>
         private BlockingCollection<IEnumerable<AnnotatedPathEntry>> pathsToProcess = new BlockingCollection<IEnumerable<AnnotatedPathEntry>>(new ConcurrentQueue<IEnumerable<AnnotatedPathEntry>>());
-         
+
         /// <summary>
         /// Cache for the listFiles operation
         /// </summary>
-        private ConcurrentDictionary<string, IEnumerable<string>> fileCache = new ConcurrentDictionary<string,IEnumerable<string>>();
+        private ConcurrentDictionary<string, IEnumerable<string>> fileCache = new ConcurrentDictionary<string, IEnumerable<string>>();
 
         /// <summary>
         /// The currently applicable path
@@ -38,12 +35,12 @@ namespace WindowsPathEditor
         /// </summary>
         private readonly IEnumerable<string> extensions;
 
-        private bool running           = true;
+        private bool running = true;
         private bool abortCurrentCheck = false;
 
         public PathChecker(IEnumerable<string> extensions)
         {
-            this.extensions = extensions.Concat(new[]{ ".dll" }).Select(_ => _.ToLower());
+            this.extensions = extensions.Concat(new[] { ".dll" }).Select(_ => _.ToLower());
             thread = new Thread(CheckerLoop);
             thread.Start();
         }
@@ -82,7 +79,7 @@ namespace WindowsPathEditor
             }
 
             listFiles(path.Path.ActualPath)
-                .Select(file => new { file=file, hit=FirstDir(file)})
+                .Select(file => new { file = file, hit = FirstDir(file) })
                 .Where(fh => fh.hit.Directory.ToLower() != path.Path.ActualPath.ToLower())
                 .Each(fh => path.AddIssue(string.Format("{0} shadowed by {1}", fh.file, fh.hit.FullPath)));
         }
@@ -92,7 +89,7 @@ namespace WindowsPathEditor
         /// </summary>
         private void CheckerLoop()
         {
-            while (running) 
+            while (running)
             {
                 IEnumerable<AnnotatedPathEntry> subject = pathsToProcess.Take();
                 if (subject != null)
@@ -129,7 +126,6 @@ namespace WindowsPathEditor
 
             return xs;
         }
-
 
         /// <summary>
         /// List all files in a directory, returning them from cache if available to speed up subsequent searches
@@ -172,5 +168,4 @@ namespace WindowsPathEditor
             thread.Join();
         }
     }
-
 }

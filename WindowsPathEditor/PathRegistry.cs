@@ -1,21 +1,20 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Win32;
-using System.Security;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace WindowsPathEditor
 {
     /// <summary>
     /// Class responsible for reading and writing paths to the registry
     /// </summary>
-    class PathRegistry
+    internal class PathRegistry
     {
         private const string SystemEnvironmentKey = @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment";
-        private const string UserEnvironmentKey   = @"Environment";
+        private const string UserEnvironmentKey = @"Environment";
 
         private bool? systemPathWritable;
 
@@ -38,11 +37,12 @@ namespace WindowsPathEditor
         }
 
         /// <summary>
-        /// Return a list of all command-line executable extensions 
+        /// Return a list of all command-line executable extensions
         /// </summary>
         public IEnumerable<String> ExecutableExtensions
         {
-            get {
+            get
+            {
                 return ReadMultipleFromRegistry(Registry.LocalMachine, SystemEnvironmentKey, "PathExt").Concat(
                     ReadMultipleFromRegistry(Registry.CurrentUser, SystemEnvironmentKey, "PathExt"));
             }
@@ -55,17 +55,19 @@ namespace WindowsPathEditor
         {
             get
             {
-                if (!systemPathWritable.HasValue) {
+                if (!systemPathWritable.HasValue)
+                {
                     try
                     {
                         var k = Registry.LocalMachine.OpenSubKey(SystemEnvironmentKey, true);
-                        if (k == null) {
+                        if (k == null)
+                        {
                             systemPathWritable = false;
                             return false;
                         }
                         k.Dispose();
                         systemPathWritable = true;
-                    } 
+                    }
                     catch (SecurityException)
                     {
                         systemPathWritable = false;
@@ -88,7 +90,7 @@ namespace WindowsPathEditor
 
                 var reg = k.GetValue(value, "", RegistryValueOptions.DoNotExpandEnvironmentNames) ?? "";
                 var path = reg is string ? (string)reg : "";
-    
+
                 return path.Split(';').Where(_ => _ != "");
             }
         }
@@ -110,7 +112,7 @@ namespace WindowsPathEditor
         /// Explorer caches the environment vars internally. Without this signal,
         /// they won't get reread from the registry.
         /// </remarks>
-        private static void KickExplorer() 
+        private static void KickExplorer()
         {
             UIntPtr retVal;
             IntPtr HWND_BROADCAST = new IntPtr(0xffff);
@@ -119,25 +121,24 @@ namespace WindowsPathEditor
                 throw new Win32Exception();
         }
 
-
-        [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern IntPtr SendMessageTimeout(
             IntPtr hWnd,
-            uint Msg, 
+            uint Msg,
             UIntPtr wParam,
-            string lParam, 
-            SendMessageTimeoutFlags fuFlags, 
-            uint uTimeout, 
+            string lParam,
+            SendMessageTimeoutFlags fuFlags,
+            uint uTimeout,
             out UIntPtr lpdwResult);
 
         private const uint WM_SETTINGCHANGE = 0x1A;
 
         [Flags]
-        enum SendMessageTimeoutFlags : uint
+        private enum SendMessageTimeoutFlags : uint
         {
-            SMTO_NORMAL             = 0x0,
-            SMTO_BLOCK              = 0x1,
-            SMTO_ABORTIFHUNG        = 0x2,
+            SMTO_NORMAL = 0x0,
+            SMTO_BLOCK = 0x1,
+            SMTO_ABORTIFHUNG = 0x2,
             SMTO_NOTIMEOUTIFNOTHUNG = 0x8
         }
     }
