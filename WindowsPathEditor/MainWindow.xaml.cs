@@ -330,7 +330,7 @@ namespace WindowsPathEditor
         private void AddNew(object sender, RoutedEventArgs e)
         {
             var filledPath = addBox.Text;
-            if (filledPath != "")
+            if (filledPath.Length > 3 && !filledPath.StartsWith(" "))
             {
                 UserPath.Add(new AnnotatedPathEntry(new PathEntry(filledPath)));
                 addBox.Clear();
