@@ -333,6 +333,7 @@ namespace WindowsPathEditor
             if (filledPath != "")
             {
                 UserPath.Add(new AnnotatedPathEntry(new PathEntry(filledPath)));
+                addBox.Clear();
             }
         }
     }
