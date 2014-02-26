@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPathEditor", "WindowsPathEditor\WindowsPathEditor.csproj", "{27BB9DC6-B4E7-4600-98E1-9C855720DF69}"
 EndProject
 Global
