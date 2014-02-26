@@ -56,7 +56,7 @@
         <Label Content="New" VerticalAlignment="Center" Grid.Row="1"/>
         <TextBox Grid.Row="1" Height="22" Margin="50,14,40,14" VerticalAlignment="Center" x:Name="addBox" />
         <Button Click="AddNew" Grid.Row="1" HorizontalAlignment="Right" Margin="0,14,10,14" Height="22" Width="22">
-            <Image Source="Resources/add.png" />
+            <Image Source="/WindowsPathEditor;component/Resources/add.png" />
         </Button>
         <GroupBox Header="Sytem Path"
             HorizontalAlignment="Stretch"
