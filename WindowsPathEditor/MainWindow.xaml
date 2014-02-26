@@ -55,8 +55,8 @@
         <wpe:AutoCompleteBox Height="22" HorizontalAlignment="Stretch" Margin="50,14,10,14" VerticalAlignment="Center" x:Name="searchBox"/>
         <Label Content="New" VerticalAlignment="Center" Grid.Row="1"/>
         <TextBox Grid.Row="1" Height="22" Margin="50,14,40,14" VerticalAlignment="Center" x:Name="addBox" />
-        <Button Click="AddNew" Grid.Row="1" HorizontalAlignment="Right" Margin="0,14,10,14" Height="20" Width="20">
-            <Image Source="/WindowsPathEditor;component/Resources/add.png" />
+        <Button Click="AddNew" Grid.Row="1" HorizontalAlignment="Right" Margin="0,14,10,14" Height="22" Width="22">
+            <Image Source="Resources/add.png" />
         </Button>
         <GroupBox Header="Sytem Path"
             HorizontalAlignment="Stretch"
@@ -97,17 +97,20 @@
                 </wpe:DirectoryList.InputBindings>
             </wpe:DirectoryList>
         </GroupBox>
-        <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="3" d:IsLocked="True">
-            <TextBlock TextWrapping="WrapWithOverflow"><Run Text="Drag and drop to reorder. Drag from Explorer to add."/></TextBlock>
-            <CheckBox Content="Show problems" Height="16" x:Name="ShowIssues" IsChecked="False" Margin="0,30,0,30" />
+        <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="4" d:IsLocked="True">
+            <TextBlock TextWrapping="WrapWithOverflow" Margin="0,10,0,0"><Run Text="Drag and drop to reorder."/></TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow" Margin="0,10,0,0"><Run Text="Drag from Explorer to add."/></TextBlock>
+            <CheckBox Height="30" x:Name="ShowIssues" IsChecked="False" Margin="0,30,0,30">
+                <TextBlock TextWrapping="WrapWithOverflow"><Run Text="Potential Problems Details" /></TextBlock>
+            </CheckBox>
             <Button Click="Clean_Click" Content="Clean Up" Padding="0,3"/>
             <StackPanel>
-                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,0"><Run Text="Remove nonexistant and duplicates."/></TextBlock>
+                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,0"><Run Text="Remove nonexistent and duplicates."/></TextBlock>
             </StackPanel>
             <Border Height="20" />
             <Button Click="Scan_Click" Content="Automatic" Padding="0,3"/>
             <StackPanel>
-                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,0"><Run Text="Search for directories called &quot;bin&quot; in this disk:"/></TextBlock>
+                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,5"><Run Text="Search for &quot;\bin&quot; directories in this disk:"/></TextBlock>
                 <ComboBox x:Name="DiskSelection" />
             </StackPanel>
             <Border Height="20" />
@@ -117,7 +120,6 @@
                     <TextBlock><Run Text="Save"/></TextBlock>
                 </StackPanel>
             </Button>
-            <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,0"><Run Text="Write changes to registry."/></TextBlock>
         </StackPanel>
     </Grid>
 </Window>
