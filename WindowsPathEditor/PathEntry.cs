@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using System.IO;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace WindowsPathEditor
@@ -34,7 +32,7 @@ namespace WindowsPathEditor
         /// <summary>
         /// The actual path
         /// </summary>
-        public string ActualPath 
+        public string ActualPath
         {
             get { return Path.GetFullPath(Environment.ExpandEnvironmentVariables(SymbolicPath)).TrimEnd('\\'); }
         }
@@ -53,7 +51,8 @@ namespace WindowsPathEditor
             {
                 return Directory.EnumerateFiles(ActualPath, prefix + "*")
                     .Select(file => new PathMatch(ActualPath, Path.GetFileName(file)));
-            } catch (IOException)
+            }
+            catch (IOException)
             {
                 return Enumerable.Empty<PathMatch>();
             }
@@ -62,12 +61,6 @@ namespace WindowsPathEditor
         public override string ToString()
         {
             return SymbolicPath;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is PathEntry)) return false;
-            return ((PathEntry)obj).ActualPath.ToLower() == ActualPath.ToLower();
         }
 
         public override int GetHashCode()
@@ -113,6 +106,5 @@ namespace WindowsPathEditor
                 ls.Add((DictionaryEntry)entry);
             return ls;
         }
-
     }
 }

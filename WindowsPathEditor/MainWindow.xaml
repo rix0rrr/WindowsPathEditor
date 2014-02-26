@@ -1,9 +1,10 @@
-﻿<Window x:Class="WindowsPathEditor.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wpe="clr-namespace:WindowsPathEditor"
         xmlns:dd="clr-namespace:DragDropListBox"
-        Title="Windows Path Editor" Height="495" Width="607" DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="WindowsPathEditor.MainWindow"
+        Title="Windows Path Editor" Height="600" Width="800" DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen"
         Closed="Window_Closed">
     <Window.Resources>
@@ -27,6 +28,9 @@
             <BooleanToVisibilityConverter />
         </wpe:ValueConverterGroup>
     </Window.Resources>
+    <Window.Background>
+        <StaticResource ResourceKey="{x:Static SystemColors.ControlBrushKey}"/>
+    </Window.Background>
     <Window.CommandBindings>
         <CommandBinding Command="Open" Executed="DoExplore" CanExecute="CanExplore"/>
         <CommandBinding Command="Delete" Executed="DoDelete" CanExecute="CanDelete"/>
@@ -36,29 +40,35 @@
         <KeyBinding Key="Delete" Command="Delete" />
         <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
     </Window.InputBindings>
-    <Grid Margin="5">
+    <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="374*" />
             <ColumnDefinition Width="150" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Label Content="Type to search (which)" VerticalAlignment="Center"></Label>
-        <wpe:AutoCompleteBox Height="23" HorizontalAlignment="Stretch" Margin="133,0,10,0" VerticalAlignment="Center" x:Name="searchBox"/>
+        <Label Content="Search" VerticalAlignment="Center"/>
+        <wpe:AutoCompleteBox Height="22" HorizontalAlignment="Stretch" Margin="50,14,10,14" VerticalAlignment="Center" x:Name="searchBox"/>
+        <Label Content="New" VerticalAlignment="Center" Grid.Row="1"/>
+        <TextBox Grid.Row="1" Height="22" Margin="50,14,40,14" VerticalAlignment="Center" x:Name="addBox" />
+        <Button Click="AddNew" Grid.Row="1" HorizontalAlignment="Right" Margin="0,14,10,14" Height="22" Width="22">
+            <Image Source="/WindowsPathEditor;component/Resources/add.png" />
+        </Button>
         <GroupBox Header="Sytem Path"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  Margin="0,0,0,10"
-                  Grid.Row="1">
-            <wpe:DirectoryList ItemsSource="{Binding Path=SystemPath}" Margin="4"
-                               dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
-                               dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
-                               ContextMenu="{DynamicResource ContextMenu}"
-                               ShowIssues="{Binding ElementName=ShowIssues, Path=IsChecked}"
-                               x:Name="systemList"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Margin="0,0,0,10"
+            Grid.Row="2" d:IsLocked="True">
+            <wpe:DirectoryList ItemsSource="{Binding SystemPath}" Margin="4"
+                dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
+                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
+                ContextMenu="{DynamicResource ContextMenu}"
+                ShowIssues="{Binding IsChecked, ElementName=ShowIssues}"
+                x:Name="systemList"
                                >
                 <wpe:DirectoryList.InputBindings>
                     <KeyBinding Key="Delete" Command="Delete" />
@@ -67,58 +77,47 @@
             </wpe:DirectoryList>
         </GroupBox>
         <GridSplitter HorizontalAlignment="Stretch"
-                      ResizeDirection="Rows"
-                      Height="10"
-                      Grid.Row="1"
-                      VerticalAlignment="Bottom" Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window, AncestorLevel=1}, Path=Background}" />
+            ResizeDirection="Rows"
+            Height="10"
+            Grid.Row="2"
+            VerticalAlignment="Bottom" Background="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type Window}}}" d:IsLocked="True" />
         <GroupBox Header="User Path"
-                  Grid.Row="2"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch">
-            <wpe:DirectoryList ItemsSource="{Binding Path=UserPath}" Margin="4"
-                               dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
-                               dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
-                               ContextMenu="{DynamicResource ContextMenu}"
-                               ShowIssues="{Binding ElementName=ShowIssues, Path=IsChecked}"
-                               x:Name="userList">
+            Grid.Row="3"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch" d:IsLocked="True">
+            <wpe:DirectoryList ItemsSource="{Binding UserPath}" Margin="4"
+                dd:DragDropHelper.IsDropTarget="True" dd:DragDropHelper.IsDragSource="true"
+                dd:DragDropHelper.ExternalDropConverter="{Binding FileDropConverter}"
+                ContextMenu="{DynamicResource ContextMenu}"
+                ShowIssues="{Binding IsChecked, ElementName=ShowIssues}"
+                x:Name="userList">
                 <wpe:DirectoryList.InputBindings>
                     <KeyBinding Key="Delete" Command="Delete" />
                     <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
                 </wpe:DirectoryList.InputBindings>
             </wpe:DirectoryList>
         </GroupBox>
-        <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="3">
-            <TextBlock TextWrapping="WrapWithOverflow">Drag and drop to reorder. Drag from Explorer to add.</TextBlock>
-
-            <Border Height="30"></Border>
-            <CheckBox Content="Show problems" Height="16" Name="ShowIssues" IsChecked="False" />
-            <Border Height="30">
-            </Border>
-            <Button Click="Clean_Click" Padding="0,5">
-                <StackPanel>
-                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold">Clean Up</TextBlock>
-                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Remove nonexistant and duplicates.</TextBlock>
-                </StackPanel>
-            </Button>
-
+        <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="4" d:IsLocked="True">
+            <TextBlock TextWrapping="WrapWithOverflow" Margin="0,10,0,0"><Run Text="Drag and drop to reorder."/></TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow" Margin="0,10,0,0"><Run Text="Drag from Explorer to add."/></TextBlock>
+            <CheckBox Height="30" x:Name="ShowIssues" IsChecked="False" Margin="0,30,0,30">
+                <TextBlock TextWrapping="WrapWithOverflow"><Run Text="Potential Problems Details" /></TextBlock>
+            </CheckBox>
+            <Button Click="Clean_Click" Content="Clean Up" Padding="0,3"/>
+            <StackPanel>
+                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,0"><Run Text="Remove nonexistent and duplicates."/></TextBlock>
+            </StackPanel>
             <Border Height="20" />
-
-            <Button Padding="0,5" Click="Scan_Click">
-                <StackPanel>
-                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold">Automatic</TextBlock>
-                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Search C:\ for directories called "bin".</TextBlock>
-                </StackPanel>
-            </Button>
-
+            <Button Click="Scan_Click" Content="Automatic" Padding="0,3"/>
+            <StackPanel>
+                <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Margin="0,5,0,5"><Run Text="Search for &quot;\bin&quot; directories in this disk:"/></TextBlock>
+                <ComboBox x:Name="DiskSelection" />
+            </StackPanel>
             <Border Height="20" />
-
-            <Button Command="Save">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Image Source="{Binding ShieldIcon}" Visibility="{Binding NeedsElevation, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,5,0"/>
-                        <TextBlock FontWeight="Bold">Save</TextBlock>
-                    </StackPanel>
-                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Write changes to registry.</TextBlock>
+            <Button Command="Save" Padding="0,3">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Source="{Binding ShieldIcon}" Visibility="{Binding NeedsElevation, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,5,0"/>
+                    <TextBlock><Run Text="Save"/></TextBlock>
                 </StackPanel>
             </Button>
         </StackPanel>

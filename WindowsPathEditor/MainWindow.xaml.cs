@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Collections.ObjectModel;
-using System.Threading;
-using System.IO;
-using System.Diagnostics;
-using System.Windows.Interop;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace WindowsPathEditor
 {
@@ -41,6 +32,16 @@ namespace WindowsPathEditor
             ShieldIcon = UAC.GetShieldIcon();
             searchBox.SetCompleteProvider(checker.Search);
 
+            var AllDrives = DriveInfo.GetDrives();
+            foreach (DriveInfo Drive in AllDrives)
+            {
+                if (Drive.DriveType == DriveType.Fixed)
+                {
+                    DiskSelection.Items.Add(Drive.Name);
+                }
+            }
+            DiskSelection.SelectedIndex = 0;
+
             var args = Environment.GetCommandLineArgs();
             if (args.Count() > 1)
             {
@@ -63,11 +64,13 @@ namespace WindowsPathEditor
         {
             for (int i = 0; i < args.Count(); i++)
             {
-                if (args.ElementAt(i).ToLower() == "/system") {
+                if (args.ElementAt(i).ToLower() == "/system")
+                {
                     reg.SystemPath = ParseCommandLinePath(args.ElementAt(i + 1));
                     i++;
                 }
-                if (args.ElementAt(i).ToLower() == "/user") {
+                if (args.ElementAt(i).ToLower() == "/user")
+                {
                     reg.UserPath = ParseCommandLinePath(args.ElementAt(i + 1));
                     i++;
                 }
@@ -81,15 +84,15 @@ namespace WindowsPathEditor
 
         private void SetPaths(IEnumerable<PathEntry> systemPath, IEnumerable<PathEntry> userPath)
         {
-            lock(stateLock)
+            lock (stateLock)
             {
                 SystemPath = new ObservableCollection<AnnotatedPathEntry>(systemPath.Select(AnnotatedPathEntry.FromPath));
-                UserPath   = new ObservableCollection<AnnotatedPathEntry>(userPath.Select(AnnotatedPathEntry.FromPath));
-    
+                UserPath = new ObservableCollection<AnnotatedPathEntry>(userPath.Select(AnnotatedPathEntry.FromPath));
+
                 DirtyPaths();
-    
+
                 SystemPath.CollectionChanged += (a, b) => DirtyPaths();
-                UserPath.CollectionChanged   += (a, b) => DirtyPaths();
+                UserPath.CollectionChanged += (a, b) => DirtyPaths();
             }
         }
 
@@ -97,7 +100,7 @@ namespace WindowsPathEditor
         {
             get
             {
-                lock(stateLock)
+                lock (stateLock)
                 {
                     return SystemPath.Concat(UserPath).Select(_ => _.Path);
                 }
@@ -150,6 +153,7 @@ namespace WindowsPathEditor
         }
 
         #region Dependency Properties
+
         public ObservableCollection<AnnotatedPathEntry> SystemPath
         {
             get { return (ObservableCollection<AnnotatedPathEntry>)GetValue(SystemPathProperty); }
@@ -186,7 +190,7 @@ namespace WindowsPathEditor
             get { return !reg.IsSystemPathWritable && SystemPathChanged; }
         }
 
-        #endregion
+        #endregion Dependency Properties
 
         /// <summary>
         /// Called when the user has changed the path lists, to force WPF to reevaluate properties that depend on the lists
@@ -214,7 +218,7 @@ namespace WindowsPathEditor
         /// <summary>
         /// Compare two path lists
         /// </summary>
-        private bool PathListEqual(IEnumerable<PathEntry> original,ObservableCollection<AnnotatedPathEntry> edited)
+        private bool PathListEqual(IEnumerable<PathEntry> original, ObservableCollection<AnnotatedPathEntry> edited)
         {
             return original.Count() == edited.Count() && original.Zip(edited, (a, b) => a.SymbolicPath == b.SymbolicPath).All(_ => _);
         }
@@ -229,7 +233,7 @@ namespace WindowsPathEditor
                 var sp = SystemPath.Select(_ => _.Path);
                 var up = UserPath.Select(_ => _.Path);
                 var cp = sp.Concat(up);
-    
+
                 var s = sp.Where((p, index) => p.Exists && !sp.Take(index).Contains(p));
                 var u = up.Where((p, index) => p.Exists && !cp.Take(sp.Count() + index).Contains(p));
 
@@ -237,11 +241,12 @@ namespace WindowsPathEditor
             }
         }
 
-        public Func <IDataObject, object> FileDropConverter
+        public Func<IDataObject, object> FileDropConverter
         {
             get
             {
-                return data => {
+                return data =>
+                {
                     var d = data as System.Windows.DataObject;
                     if (d == null || !d.ContainsFileDropList() || d.GetFileDropList().Count == 0) return null;
 
@@ -306,18 +311,30 @@ namespace WindowsPathEditor
         private void Scan_Click(object sender, RoutedEventArgs e)
         {
             var currentPaths = CompletePath.Select(_ => _.Path);
-            var search = new SearchOperation("C:\\", 4, new ScanningWindow());
+            var selectedDisk = DiskSelection.Text;
+            var search = new SearchOperation(selectedDisk, 4, new ScanningWindow());
 
-            Task<IEnumerable<string>>.Factory.StartNew(search.Run).ContinueWith(task => {
+            Task<IEnumerable<string>>.Factory.StartNew(search.Run).ContinueWith(task =>
+            {
                 if (task.IsFaulted) return; // Too bad
 
                 var binDirectories = task.Result;
-    
+
                 binDirectories
                     .Select(PathEntry.FromFilePath)
                     .Where(path => !currentPaths.Contains(path))
                     .Each(path => UserPath.Add(new AnnotatedPathEntry(path)));
             }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private void AddNew(object sender, RoutedEventArgs e)
+        {
+            var filledPath = addBox.Text;
+            if (filledPath.Length > 3 && !filledPath.StartsWith(" "))
+            {
+                UserPath.Add(new AnnotatedPathEntry(new PathEntry(filledPath)));
+                addBox.Clear();
+            }
         }
     }
 }

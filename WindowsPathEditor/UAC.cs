@@ -1,25 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Windows.Media.Imaging;
-using System.Windows;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
-using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace WindowsPathEditor
 {
-    class UAC
+    internal class UAC
     {
         public static BitmapSource GetShieldIcon()
         {
             if (Environment.OSVersion.Version.Major >= 6)
             {
                 SHSTOCKICONINFO sii = new SHSTOCKICONINFO();
-                sii.cbSize = (UInt32) Marshal.SizeOf(typeof(SHSTOCKICONINFO));
-            
+                sii.cbSize = (UInt32)Marshal.SizeOf(typeof(SHSTOCKICONINFO));
+
                 Marshal.ThrowExceptionForHR(SHGetStockIconInfo(SHSTOCKICONID.SIID_SHIELD,
                     SHGSI.SHGSI_ICON | SHGSI.SHGSI_SMALLICON,
                     ref sii));
@@ -27,7 +24,7 @@ namespace WindowsPathEditor
                 {
                     return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                         sii.hIcon,
-                        Int32Rect.Empty, 
+                        Int32Rect.Empty,
                         BitmapSizeOptions.FromEmptyOptions());
                 }
                 finally
@@ -39,7 +36,7 @@ namespace WindowsPathEditor
             {
                 return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                     System.Drawing.SystemIcons.Shield.Handle,
-                    Int32Rect.Empty, 
+                    Int32Rect.Empty,
                     BitmapSizeOptions.FromEmptyOptions());
             }
         }
@@ -58,7 +55,7 @@ namespace WindowsPathEditor
                 info.UseShellExecute = true;
                 info.Verb = "runas"; // Provides Run as Administrator
             }
-            
+
             try
             {
                 Process p = Process.Start(info);
@@ -69,7 +66,9 @@ namespace WindowsPathEditor
                     return false;
                 }
                 return p.ExitCode == 0;
-            } catch (Win32Exception) {
+            }
+            catch (Win32Exception)
+            {
                 return false;
             }
         }
@@ -77,8 +76,8 @@ namespace WindowsPathEditor
         [DllImport("Shell32.dll", SetLastError = false)]
         public static extern Int32 SHGetStockIconInfo(SHSTOCKICONID siid, SHGSI uFlags, ref SHSTOCKICONINFO psii);
 
-        [DllImport("user32.dll", SetLastError=true)]
-        static extern bool DestroyIcon(IntPtr hIcon);
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool DestroyIcon(IntPtr hIcon);
 
         [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SHSTOCKICONINFO
@@ -87,6 +86,7 @@ namespace WindowsPathEditor
             public IntPtr hIcon;
             public Int32 iSysIconIndex;
             public Int32 iIcon;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
             public string szPath;
         }
@@ -201,6 +201,5 @@ namespace WindowsPathEditor
             SIID_CLUSTEREDDRIVE = 140,
             SIID_MAX_ICONS = 175
         }
-
     }
 }

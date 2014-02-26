@@ -1,40 +1,40 @@
 ﻿<UserControl x:Class="WindowsPathEditor.AutoCompleteBox"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid x:Name="root">
         <TextBox HorizontalAlignment="Stretch" Name="textBox" KeyUp="textBox_KeyUp"></TextBox>
-        <Popup 
+        <Popup
               Name="popup"
-              Placement="Bottom" 
+              Placement="Bottom"
               PlacementTarget="{Binding ElementName=textBox}"
-              AllowsTransparency="true" 
-              IsOpen="False"  
+              AllowsTransparency="true"
+              IsOpen="False"
               Width="{Binding ElementName=textBox,Path=ActualWidth}"
               StaysOpen="{Binding ElementName=textBox,Path=IsKeyboardFocused}">
-            <ListBox x:Name="suggestionList" 
-              VerticalContentAlignment="Stretch" 
+            <ListBox x:Name="suggestionList"
+              VerticalContentAlignment="Stretch"
               HorizontalContentAlignment="Stretch"
               MaxHeight="200"
               KeyboardNavigation.DirectionalNavigation="Contained">
                 <ListBox.Resources>
                     <Style TargetType="ListBoxItem">
-                    <Style.Resources>
-                        <!-- SelectedItem with focus -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                        <Style.Resources>
+                            <!-- SelectedItem with focus -->
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
                        Color="Transparent" />
-                        <!-- SelectedItem without focus -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}"
+                            <!-- SelectedItem without focus -->
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}"
                        Color="Transparent" />
-                        <!-- SelectedItem text foreground -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                            <!-- SelectedItem text foreground -->
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
                        Color="Black" />
-                    </Style.Resources>
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                </Style>
+                        </Style.Resources>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    </Style>
                 </ListBox.Resources>
             </ListBox>
         </Popup>

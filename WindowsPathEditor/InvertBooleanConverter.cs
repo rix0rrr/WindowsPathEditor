@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Data;
 
 namespace WindowsPathEditor
 {
     [ValueConversion(typeof(bool), typeof(bool))]
-    class InvertBooleanConverter : IValueConverter
+    internal class InvertBooleanConverter : IValueConverter
     {
         #region IValueConverter Members
 
@@ -23,6 +20,6 @@ namespace WindowsPathEditor
             throw new NotSupportedException();
         }
 
-        #endregion
-    } 
+        #endregion IValueConverter Members
+    }
 }

@@ -1,10 +1,10 @@
 ﻿<ListBox x:Class="WindowsPathEditor.DirectoryList"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:wpe="clr-namespace:WindowsPathEditor"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              ScrollViewer.CanContentScroll="False"
              d:DesignHeight="300" d:DesignWidth="300">
     <ListBox.Resources>
@@ -15,7 +15,7 @@
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
                     <Image Name="indicatorImage" Source="/WindowsPathEditor;component/Resources/accept.png" />
-                    <TextBlock Text="{Binding SymbolicPath}" Margin="8,2,2,2"/>
+                    <TextBlock Text="{Binding SymbolicPath}" Margin="8,2,2,2" />
                 </StackPanel>
                 <ItemsControl ItemsSource="{Binding Issues}" Foreground="Crimson" FontSize="10" Margin="24,0,0,0"
                 Visibility="{Binding ShowIssues, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type wpe:DirectoryList}}, Converter={StaticResource VisibleIfTrue}}">

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace WindowsPathEditor
 {
@@ -12,6 +10,7 @@ namespace WindowsPathEditor
     public class AnnotatedPathEntry : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
         private List<string> issues = new List<string>();
 
         public AnnotatedPathEntry(PathEntry path)
@@ -38,15 +37,14 @@ namespace WindowsPathEditor
 
         public string SymbolicPath { get { return Path.SymbolicPath; } }
 
-
         /// <summary>
         /// Return all issues with the PathEntry
         /// </summary>
-        public IEnumerable<string> Issues 
+        public IEnumerable<string> Issues
         {
             get
             {
-                lock (issues) 
+                lock (issues)
                 {
                     return issues.ToList();
                 }
@@ -54,7 +52,7 @@ namespace WindowsPathEditor
         }
 
         /// <summary>
-        /// Add an issue 
+        /// Add an issue
         /// </summary>
         public void AddIssue(string issue)
         {
@@ -65,7 +63,7 @@ namespace WindowsPathEditor
 
         internal void ClearIssues()
         {
-            lock(issues) issues.Clear();
+            lock (issues) issues.Clear();
             PropertyChanged.Notify(() => Issues);
             PropertyChanged.Notify(() => AlertLevel);
         }
