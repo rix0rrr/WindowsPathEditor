@@ -282,7 +282,7 @@ namespace WindowsPathEditor
             }
             catch (Exception ex)
             {
-                Debug.Print("Exception in CanExplor: {0}", ex);
+                Debug.Print("Exception in CanExplore: {0}", ex);
             }
         }
 
@@ -299,7 +299,10 @@ namespace WindowsPathEditor
 
         private string PathAsCommandLineArgument(IEnumerable<AnnotatedPathEntry> path)
         {
-            return "\"" + string.Join(";", path) + "\"";
+            string arg = string.Join(";", path);
+            if (arg.Contains("\""))
+                throw new InvalidDataException("Error saving: path string contains \" character");
+            return "\"" + arg + "\"";
         }
 
         private IEnumerable<PathEntry> ParseCommandLinePath(string argument)

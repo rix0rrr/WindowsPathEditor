@@ -53,6 +53,8 @@ namespace WindowsPathEditor
             info.FileName = Assembly.GetEntryAssembly().GetName().CodeBase;
             info.Arguments = arguments;
 
+            Debug.Print("Launching {0} {1}", info.FileName, info.Arguments);
+
             if (elevated)
             {
                 info.UseShellExecute = true;
