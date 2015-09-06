@@ -1,7 +1,7 @@
 - Increment version number in AssemblyInfo.cs
 - Build as Debug (for the purposes of Debug.Print)
 - Zip contents of bin\Release to windowspatheditor-x.x.zip (don't include vshost.*)
-- Upload to rix0r.nl/downloads/windwospatheditor
+- Upload to GitHub releases, URL will be https://github.com/rix0rrr/WindowsPathEditor/releases/download/x.x/windowspatheditor-x.x.zip
 - Update README.md w/ new version link
 - Commit, Tag
 - Switch to gh-pages branch
