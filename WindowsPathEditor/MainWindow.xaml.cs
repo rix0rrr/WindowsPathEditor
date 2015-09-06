@@ -242,13 +242,21 @@ namespace WindowsPathEditor
             get
             {
                 return data => {
-                    var d = data as System.Windows.DataObject;
-                    if (d == null || !d.ContainsFileDropList() || d.GetFileDropList().Count == 0) return null;
-
-                    var path = d.GetFileDropList()[0];
-                    if (File.Exists(path)) path = System.IO.Path.GetDirectoryName(path);
-
-                    return new AnnotatedPathEntry(PathEntry.FromFilePath(path));
+                    string path = "...";
+                    try
+                    {
+                        var d = data as System.Windows.DataObject;
+                        if (d == null || !d.ContainsFileDropList() || d.GetFileDropList().Count == 0) return null;
+    
+                        path = d.GetFileDropList()[0];
+                        if (File.Exists(path)) path = System.IO.Path.GetDirectoryName(path);
+    
+                        return new AnnotatedPathEntry(PathEntry.FromFilePath(path));
+                    }
+                    catch (Exception ex)
+                    {
+                        return new AnnotatedPathEntry(new PathEntry(string.Format("error dragging in {0}: {1}", path, ex.Message)));
+                    }
                 };
             }
         }
