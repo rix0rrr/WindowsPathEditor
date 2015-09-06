@@ -267,7 +267,15 @@ namespace WindowsPathEditor
 
         private void CanExplore(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = GetSelectedEntry(e) != null && Directory.Exists(GetSelectedEntry(e).Path.ActualPath);
+            e.CanExecute = false;
+            try
+            {
+                e.CanExecute = GetSelectedEntry(e) != null && Directory.Exists(GetSelectedEntry(e).Path.ActualPath);
+            }
+            catch (Exception ex)
+            {
+                Debug.Print("Exception in CanExplor: {0}", ex);
+            }
         }
 
         private void DoDelete(object sender, ExecutedRoutedEventArgs e)
