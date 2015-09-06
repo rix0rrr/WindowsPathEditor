@@ -91,13 +91,13 @@
             <TextBlock TextWrapping="WrapWithOverflow">Drag and drop to reorder. Drag from Explorer to add.</TextBlock>
 
             <Border Height="30"></Border>
-            <CheckBox Content="Show problems" Height="16" Name="ShowIssues" IsChecked="False" />
+            <CheckBox Content="Show conflicts" Height="16" Name="ShowIssues" IsChecked="False" Checked="ShowIssues_Checked" />
             <Border Height="30">
             </Border>
             <Button Click="Clean_Click" Padding="0,5">
                 <StackPanel>
                     <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold">Clean Up</TextBlock>
-                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Remove nonexistant and duplicates.</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontSize="10" Margin="0,10,0,0">Remove nonexistent and duplicates.</TextBlock>
                 </StackPanel>
             </Button>
 
