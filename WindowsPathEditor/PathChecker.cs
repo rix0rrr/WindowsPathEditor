@@ -144,14 +144,29 @@ namespace WindowsPathEditor
             }
 
             var files = new List<string>();
-            foreach (var f in Directory.EnumerateFiles(path)
+
+            IEnumerable<string> directoryContents;
+            bool success = true;
+            try {
+                directoryContents = Directory.EnumerateFiles(path);
+            } catch (Exception) {
+                success = false;
+                directoryContents = new string[0];
+            }
+
+            foreach (var f in directoryContents
                 .Where(_ => extensions.Contains(Path.GetExtension(_).ToLower()))
                 .Select(Path.GetFileName))
             {
                 files.Add(f);
                 yield return f;
             }
-            fileCache[path] = files;
+
+            // Skip putting in cache in case of errors
+            if (success)
+            {
+                fileCache[path] = files;
+            }
         }
 
         /// <summary>

@@ -319,5 +319,10 @@ namespace WindowsPathEditor
                     .Each(path => UserPath.Add(new AnnotatedPathEntry(path)));
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
+
+        private void ShowIssues_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
