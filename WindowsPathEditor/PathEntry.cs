@@ -53,7 +53,12 @@ namespace WindowsPathEditor
             {
                 return Directory.EnumerateFiles(ActualPath, prefix + "*")
                     .Select(file => new PathMatch(ActualPath, Path.GetFileName(file)));
-            } catch (IOException)
+            } 
+            catch (IOException)
+            {
+                return Enumerable.Empty<PathMatch>();
+            } 
+            catch(ArgumentException)
             {
                 return Enumerable.Empty<PathMatch>();
             }
