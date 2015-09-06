@@ -17,6 +17,7 @@ namespace WindowsPathEditor
         public AnnotatedPathEntry(PathEntry path)
         {
             Path = path;
+            SeriousError = false;
         }
 
         public PathEntry Path { get; private set; }
@@ -28,11 +29,13 @@ namespace WindowsPathEditor
         {
             get
             {
-                if (!Path.Exists) return 2;
+                if (SeriousError) return 2;
                 if (issues.Count() > 0) return 1;
                 return 0;
             }
         }
+
+        public bool SeriousError { get; set; }
 
         public bool Exists { get { return Path.Exists; } }
 

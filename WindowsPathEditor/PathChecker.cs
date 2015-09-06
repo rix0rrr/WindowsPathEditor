@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using System.IO;
 using System.Collections;
+using System.Diagnostics;
 
 namespace WindowsPathEditor
 {
@@ -75,16 +76,26 @@ namespace WindowsPathEditor
         private void CheckPath(AnnotatedPathEntry path)
         {
             path.ClearIssues();
-            if (!path.Path.Exists)
+            try
             {
-                path.AddIssue("Does not exist");
-                return;
+                if (!path.Path.Exists)
+                {
+                    path.AddIssue("Does not exist");
+                    path.SeriousError = true;
+                    return;
+                }
+    
+                listFiles(path.Path.ActualPath)
+                    .Select(file => new { file=file, hit=FirstDir(file)})
+                    .Where(fh => fh.hit.Directory.ToLower() != path.Path.ActualPath.ToLower())
+                    .Each(fh => path.AddIssue(string.Format("{0} shadowed by {1}", fh.file, fh.hit.FullPath)));
             }
-
-            listFiles(path.Path.ActualPath)
-                .Select(file => new { file=file, hit=FirstDir(file)})
-                .Where(fh => fh.hit.Directory.ToLower() != path.Path.ActualPath.ToLower())
-                .Each(fh => path.AddIssue(string.Format("{0} shadowed by {1}", fh.file, fh.hit.FullPath)));
+            catch (Exception ex)
+            {
+                Debug.Print("Error checking path: {0}", ex);
+                path.SeriousError = true;
+                path.AddIssue(string.Format("Error checking this path: {0}", ex.Message));
+            }
         }
 
         /// <summary>
@@ -144,17 +155,7 @@ namespace WindowsPathEditor
             }
 
             var files = new List<string>();
-
-            IEnumerable<string> directoryContents;
-            bool success = true;
-            try {
-                directoryContents = Directory.EnumerateFiles(path);
-            } catch (Exception) {
-                success = false;
-                directoryContents = new string[0];
-            }
-
-            foreach (var f in directoryContents
+            foreach (var f in Directory.EnumerateFiles(path)
                 .Where(_ => extensions.Contains(Path.GetExtension(_).ToLower()))
                 .Select(Path.GetFileName))
             {
@@ -162,11 +163,7 @@ namespace WindowsPathEditor
                 yield return f;
             }
 
-            // Skip putting in cache in case of errors
-            if (success)
-            {
-                fileCache[path] = files;
-            }
+            fileCache[path] = files;
         }
 
         /// <summary>
