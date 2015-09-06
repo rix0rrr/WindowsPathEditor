@@ -1,5 +1,5 @@
 - Increment version number in AssemblyInfo.cs
-- Build as Release
+- Build as Debug (for the purposes of Debug.Print)
 - Zip contents of bin\Release to windowspatheditor-x.x.zip (don't include vshost.*)
 - Upload to rix0r.nl/downloads/windwospatheditor
 - Update README.md w/ new version link
