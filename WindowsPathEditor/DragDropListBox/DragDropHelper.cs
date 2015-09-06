@@ -163,39 +163,46 @@ namespace DragDropListBox
 		// Drag = mouse down + move by a certain amount
 		private void DragSource_PreviewMouseMove(object sender, MouseEventArgs e)
 		{
-			if (this.draggedData != null)
-			{
-				// Only drag when user moved the mouse by a reasonable amount.
-				if (Utilities.IsMovementBigEnough(this.initialMousePosition, e.GetPosition(this.topWindow)))
-				{
-					this.initialMouseOffset = this.initialMousePosition - this.sourceItemContainer.TranslatePoint(new Point(0, 0), this.topWindow);
-
-					DataObject data = new DataObject(this.format.Name, this.draggedData);
-
-					// Adding events to the window to make sure dragged adorner comes up when mouse is not over a drop target.
-					bool previousAllowDrop = this.topWindow.AllowDrop;
-					this.topWindow.AllowDrop = true;
-					this.topWindow.DragEnter += TopWindow_DragEnter;
-					this.topWindow.DragOver += TopWindow_DragOver;
-					this.topWindow.DragLeave += TopWindow_DragLeave;
-					
-					DragDropEffects effects = DragDrop.DoDragDrop((DependencyObject)sender, data, DragDropEffects.Move);
-
-					// Without this call, there would be a bug in the following scenario: Click on a data item, and drag
-					// the mouse very fast outside of the window. When doing this really fast, for some reason I don't get 
-					// the Window leave event, and the dragged adorner is left behind.
-					// With this call, the dragged adorner will disappear when we release the mouse outside of the window,
-					// which is when the DoDragDrop synchronous method returns.
-					RemoveDraggedAdorner();
-
-					this.topWindow.AllowDrop = previousAllowDrop;
-					this.topWindow.DragEnter -= TopWindow_DragEnter;
-					this.topWindow.DragOver -= TopWindow_DragOver;
-					this.topWindow.DragLeave -= TopWindow_DragLeave;
-					
-					this.draggedData = null;
-				}
-			}
+            try
+            {
+                if (this.draggedData != null)
+                {
+                    // Only drag when user moved the mouse by a reasonable amount.
+                    if (Utilities.IsMovementBigEnough(this.initialMousePosition, e.GetPosition(this.topWindow)))
+                    {
+                        this.initialMouseOffset = this.initialMousePosition - this.sourceItemContainer.TranslatePoint(new Point(0, 0), this.topWindow);
+    
+                        DataObject data = new DataObject(this.format.Name, this.draggedData);
+    
+                        // Adding events to the window to make sure dragged adorner comes up when mouse is not over a drop target.
+                        bool previousAllowDrop = this.topWindow.AllowDrop;
+                        this.topWindow.AllowDrop = true;
+                        this.topWindow.DragEnter += TopWindow_DragEnter;
+                        this.topWindow.DragOver += TopWindow_DragOver;
+                        this.topWindow.DragLeave += TopWindow_DragLeave;
+                        
+                        DragDropEffects effects = DragDrop.DoDragDrop((DependencyObject)sender, data, DragDropEffects.Move);
+    
+                        // Without this call, there would be a bug in the following scenario: Click on a data item, and drag
+                        // the mouse very fast outside of the window. When doing this really fast, for some reason I don't get 
+                        // the Window leave event, and the dragged adorner is left behind.
+                        // With this call, the dragged adorner will disappear when we release the mouse outside of the window,
+                        // which is when the DoDragDrop synchronous method returns.
+                        RemoveDraggedAdorner();
+    
+                        this.topWindow.AllowDrop = previousAllowDrop;
+                        this.topWindow.DragEnter -= TopWindow_DragEnter;
+                        this.topWindow.DragOver -= TopWindow_DragOver;
+                        this.topWindow.DragLeave -= TopWindow_DragLeave;
+                        
+                        this.draggedData = null;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // This explodes sometimes, dunno why
+            }
 		}
 			
 		private void DragSource_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

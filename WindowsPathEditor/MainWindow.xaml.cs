@@ -338,6 +338,18 @@ namespace WindowsPathEditor
                     .Each(path => UserPath.Add(new AnnotatedPathEntry(path)));
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
+        
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    var entry = new AnnotatedPathEntry(PathEntry.FromFilePath(dialog.SelectedPath));
+                    UserPath.Add(entry);
+                }
+            }
+        }
 
         private void ShowIssues_Checked(object sender, RoutedEventArgs e)
         {

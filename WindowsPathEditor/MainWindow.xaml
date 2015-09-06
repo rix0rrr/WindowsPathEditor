@@ -45,6 +45,7 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="15"/>
         </Grid.RowDefinitions>
         <Label Content="Type to search (which)" VerticalAlignment="Center"></Label>
         <wpe:AutoCompleteBox Height="23" HorizontalAlignment="Stretch" Margin="133,0,10,0" VerticalAlignment="Center" x:Name="searchBox"/>
@@ -87,13 +88,19 @@
                 </wpe:DirectoryList.InputBindings>
             </wpe:DirectoryList>
         </GroupBox>
-        <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="3">
-            <TextBlock TextWrapping="WrapWithOverflow">Drag and drop to reorder. Drag from Explorer to add.</TextBlock>
-
-            <Border Height="30"></Border>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Margin="20,5,20,5" VerticalAlignment="Stretch" Grid.RowSpan="4">
+            <Border Height="70"></Border>
             <CheckBox Content="Show conflicts" Height="16" Name="ShowIssues" IsChecked="False" Checked="ShowIssues_Checked" />
-            <Border Height="30">
+            <Border Height="20">
             </Border>
+            <Button Click="Add_Click" Padding="0,5">
+                <StackPanel>
+                    <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold">Add Dir...</TextBlock>
+                </StackPanel>
+            </Button>
+            <TextBlock FontSize="10" TextWrapping="WrapWithOverflow" TextAlignment="Center">(or drag from Explorer)</TextBlock>
+
+            <Border Height="20" />
             <Button Click="Clean_Click" Padding="0,5">
                 <StackPanel>
                     <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center" FontWeight="Bold">Clean Up</TextBlock>
@@ -122,5 +129,7 @@
                 </StackPanel>
             </Button>
         </StackPanel>
+
+        <TextBlock Grid.Column="0" Grid.Row="3" FontSize="10" TextWrapping="WrapWithOverflow">Drag elements in and between lists to change search order.</TextBlock>
     </Grid>
 </Window>
