@@ -67,6 +67,10 @@
     <Compile Include="AutoCompleteBox.xaml.cs">
       <DependentUpon>AutoCompleteBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DiffPath.cs" />
+    <Compile Include="DiffWindow.xaml.cs">
+      <DependentUpon>DiffWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InvertBooleanConverter.cs" />
     <Compile Include="IReportProgress.cs" />
     <Compile Include="ObservableCollectionEx.cs" />
@@ -84,6 +88,10 @@
     <Compile Include="UAC.cs" />
     <Compile Include="ValueConverterGroup.cs" />
     <Page Include="AutoCompleteBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DiffWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -155,6 +163,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\cross.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\add.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

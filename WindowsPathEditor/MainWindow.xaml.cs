@@ -314,7 +314,22 @@ namespace WindowsPathEditor
 
         private void DoSave(object sender, ExecutedRoutedEventArgs e)
         {
-            Write();
+            lock(stateLock)
+            {
+                var window = new DiffWindow();
+                List<PathEntry> newPaths = new List<PathEntry>(SystemPath.Concat(UserPath).Select(_ => _.Path));
+                List<PathEntry> oldPaths = new List<PathEntry>(reg.SystemPath.Concat(reg.UserPath));
+                foreach (var x in new ObservableCollection<DiffPath>(newPaths.Except(oldPaths).Select(p => new DiffPath(p, true)).Concat(
+                                oldPaths.Except(newPaths).Select(p => new DiffPath(p, false)))))
+                {
+                    window.Changes.Add(x);
+                }
+    
+                if (window.ShowDialog() == true)
+                {
+                    Write();
+                }
+            }
         }
 
         private void CanSave(object sender, CanExecuteRoutedEventArgs e)
@@ -330,9 +345,7 @@ namespace WindowsPathEditor
             var search = new SearchOperation("C:\\", 4, window);
 
             Task<IEnumerable<string>>.Factory.StartNew(search.Run);
-
-            var result = window.ShowDialog();
-            if (result.HasValue && result.Value)
+            if (window.ShowDialog() == true)
             {
                 UserPath.SupressNotification = true;
                 search.Result
@@ -356,6 +369,11 @@ namespace WindowsPathEditor
         }
 
         private void ShowIssues_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
 
         }
