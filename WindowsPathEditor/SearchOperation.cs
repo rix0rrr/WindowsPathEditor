@@ -15,7 +15,7 @@ namespace WindowsPathEditor
     class SearchOperation
     {
         private readonly String root;
-        private readonly List<String> results = new List<String>();
+        private readonly List<String> result = new List<String>();
         private readonly IReportProgress progressSink;
         private readonly int maxDepth;
 
@@ -26,6 +26,8 @@ namespace WindowsPathEditor
             this.maxDepth     = maxDepth;
         }
 
+        public List<string> Result { get { return result; }}
+
         public IEnumerable<string> Run()
         {
             progressSink.Begin();
@@ -33,7 +35,7 @@ namespace WindowsPathEditor
             Search(root, 0);
 
             progressSink.Done();
-            return results;
+            return result;
         }
 
         private void Search(String dir, int level)
@@ -43,9 +45,14 @@ namespace WindowsPathEditor
 
             if (Path.GetFileName(dir).ToLower() == "bin")
             {
-                results.Add(dir);
+                progressSink.FoundCandidate(dir);
+                result.Add(dir);
                 return; // No need to descend further 
             }
+
+            // Skip the Windows directory. It's huge and the chance of bounty is small.
+            if (Path.GetFullPath(dir).ToLower() == Environment.GetEnvironmentVariable("windir").ToLower())
+                return;
 
             // If this is not a 'bin' directory, search its children
             if (level < maxDepth)

@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="InvertBooleanConverter.cs" />
     <Compile Include="IReportProgress.cs" />
+    <Compile Include="ObservableCollectionEx.cs" />
     <Compile Include="PathChecker.cs" />
     <Compile Include="DragDropListBox\DragDropHelper.cs" />
     <Compile Include="DragDropListBox\DraggedAdorner.cs" />
@@ -79,6 +80,7 @@
       <DependentUpon>ScanningWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SearchOperation.cs" />
+    <Compile Include="SelectablePath.cs" />
     <Compile Include="UAC.cs" />
     <Compile Include="ValueConverterGroup.cs" />
     <Page Include="AutoCompleteBox.xaml">

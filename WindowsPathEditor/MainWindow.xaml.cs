@@ -83,8 +83,8 @@ namespace WindowsPathEditor
         {
             lock(stateLock)
             {
-                SystemPath = new ObservableCollection<AnnotatedPathEntry>(systemPath.Select(AnnotatedPathEntry.FromPath));
-                UserPath   = new ObservableCollection<AnnotatedPathEntry>(userPath.Select(AnnotatedPathEntry.FromPath));
+                SystemPath = new ObservableCollectionEx<AnnotatedPathEntry>(systemPath.Select(AnnotatedPathEntry.FromPath));
+                UserPath   = new ObservableCollectionEx<AnnotatedPathEntry>(userPath.Select(AnnotatedPathEntry.FromPath));
     
                 DirtyPaths();
     
@@ -150,26 +150,26 @@ namespace WindowsPathEditor
         }
 
         #region Dependency Properties
-        public ObservableCollection<AnnotatedPathEntry> SystemPath
+        public ObservableCollectionEx<AnnotatedPathEntry> SystemPath
         {
-            get { return (ObservableCollection<AnnotatedPathEntry>)GetValue(SystemPathProperty); }
+            get { return (ObservableCollectionEx<AnnotatedPathEntry>)GetValue(SystemPathProperty); }
             set { SetValue(SystemPathProperty, value); }
         }
 
         public static readonly DependencyProperty SystemPathProperty =
-            DependencyProperty.Register("SystemPath", typeof(ObservableCollection<AnnotatedPathEntry>),
-            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>(),
+            DependencyProperty.Register("SystemPath", typeof(ObservableCollectionEx<AnnotatedPathEntry>),
+            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollectionEx<AnnotatedPathEntry>(),
                 (obj, e) => { ((MainWindow)obj).InvalidateDependentProperties(); }));
 
-        public ObservableCollection<AnnotatedPathEntry> UserPath
+        public ObservableCollectionEx<AnnotatedPathEntry> UserPath
         {
-            get { return (ObservableCollection<AnnotatedPathEntry>)GetValue(UserPathProperty); }
+            get { return (ObservableCollectionEx<AnnotatedPathEntry>)GetValue(UserPathProperty); }
             set { SetValue(UserPathProperty, value); }
         }
 
         public static readonly DependencyProperty UserPathProperty =
-            DependencyProperty.Register("UserPath", typeof(ObservableCollection<AnnotatedPathEntry>),
-            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollection<AnnotatedPathEntry>(),
+            DependencyProperty.Register("UserPath", typeof(ObservableCollectionEx<AnnotatedPathEntry>),
+            typeof(MainWindow), new UIPropertyMetadata(new ObservableCollectionEx<AnnotatedPathEntry>(),
                 (obj, e) => { ((MainWindow)obj).InvalidateDependentProperties(); }));
 
         public BitmapSource ShieldIcon
@@ -214,7 +214,7 @@ namespace WindowsPathEditor
         /// <summary>
         /// Compare two path lists
         /// </summary>
-        private bool PathListEqual(IEnumerable<PathEntry> original,ObservableCollection<AnnotatedPathEntry> edited)
+        private bool PathListEqual(IEnumerable<PathEntry> original,ObservableCollectionEx<AnnotatedPathEntry> edited)
         {
             return original.Count() == edited.Count() && original.Zip(edited, (a, b) => a.SymbolicPath == b.SymbolicPath).All(_ => _);
         }
@@ -325,18 +325,22 @@ namespace WindowsPathEditor
         private void Scan_Click(object sender, RoutedEventArgs e)
         {
             var currentPaths = CompletePath.Select(_ => _.Path);
-            var search = new SearchOperation("C:\\", 4, new ScanningWindow());
 
-            Task<IEnumerable<string>>.Factory.StartNew(search.Run).ContinueWith(task => {
-                if (task.IsFaulted) return; // Too bad
+            var window = new ScanningWindow();
+            var search = new SearchOperation("C:\\", 4, window);
 
-                var binDirectories = task.Result;
-    
-                binDirectories
+            Task<IEnumerable<string>>.Factory.StartNew(search.Run);
+
+            var result = window.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                UserPath.SupressNotification = true;
+                search.Result
                     .Select(PathEntry.FromFilePath)
                     .Where(path => !currentPaths.Contains(path))
                     .Each(path => UserPath.Add(new AnnotatedPathEntry(path)));
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                UserPath.SupressNotification = false;
+            }
         }
         
         private void Add_Click(object sender, RoutedEventArgs e)

@@ -11,6 +11,8 @@ namespace WindowsPathEditor
 
         void ReportProgress(string progress);
 
+        void FoundCandidate(string path);
+
         void Done();
 
         bool Cancelled { get; }
