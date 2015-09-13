@@ -35,7 +35,7 @@ namespace DragDropListBox
 			// near the mouse cursor when dragging.
 			this.left = left - 1;
 			this.top = top + 13;
-			if (this.adornerLayer != null)
+            if (this.adornerLayer != null && this.contentPresenter.Content != null)
 			{
 				this.adornerLayer.Update(this.AdornedElement);
 			}
