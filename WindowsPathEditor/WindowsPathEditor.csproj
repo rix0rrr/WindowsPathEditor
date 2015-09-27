@@ -74,6 +74,9 @@
     <Compile Include="DiffWindow.xaml.cs">
       <DependentUpon>DiffWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FolderBrowserDialogEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="InvertBooleanConverter.cs" />
     <Compile Include="IReportProgress.cs" />
     <Compile Include="ObservableCollectionEx.cs" />

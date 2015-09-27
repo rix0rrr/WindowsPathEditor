@@ -63,11 +63,13 @@ namespace WindowsPathEditor
         {
             for (int i = 0; i < args.Count(); i++)
             {
-                if (args.ElementAt(i).ToLower() == "/system") {
+                if (args.ElementAt(i).ToLower() == "/system")
+                {
                     reg.SystemPath = ParseCommandLinePath(args.ElementAt(i + 1));
                     i++;
                 }
-                if (args.ElementAt(i).ToLower() == "/user") {
+                if (args.ElementAt(i).ToLower() == "/user")
+                {
                     reg.UserPath = ParseCommandLinePath(args.ElementAt(i + 1));
                     i++;
                 }
@@ -81,15 +83,15 @@ namespace WindowsPathEditor
 
         private void SetPaths(IEnumerable<PathEntry> systemPath, IEnumerable<PathEntry> userPath)
         {
-            lock(stateLock)
+            lock (stateLock)
             {
                 SystemPath = new ObservableCollectionEx<AnnotatedPathEntry>(systemPath.Select(AnnotatedPathEntry.FromPath));
-                UserPath   = new ObservableCollectionEx<AnnotatedPathEntry>(userPath.Select(AnnotatedPathEntry.FromPath));
-    
+                UserPath = new ObservableCollectionEx<AnnotatedPathEntry>(userPath.Select(AnnotatedPathEntry.FromPath));
+
                 DirtyPaths();
-    
+
                 SystemPath.CollectionChanged += (a, b) => DirtyPaths();
-                UserPath.CollectionChanged   += (a, b) => DirtyPaths();
+                UserPath.CollectionChanged += (a, b) => DirtyPaths();
             }
         }
 
@@ -97,7 +99,7 @@ namespace WindowsPathEditor
         {
             get
             {
-                lock(stateLock)
+                lock (stateLock)
                 {
                     return SystemPath.Concat(UserPath).Select(_ => _.Path);
                 }
@@ -214,7 +216,7 @@ namespace WindowsPathEditor
         /// <summary>
         /// Compare two path lists
         /// </summary>
-        private bool PathListEqual(IEnumerable<PathEntry> original,ObservableCollectionEx<AnnotatedPathEntry> edited)
+        private bool PathListEqual(IEnumerable<PathEntry> original, ObservableCollectionEx<AnnotatedPathEntry> edited)
         {
             return original.Count() == edited.Count() && original.Zip(edited, (a, b) => a.SymbolicPath == b.SymbolicPath).All(_ => _);
         }
@@ -229,7 +231,7 @@ namespace WindowsPathEditor
                 var sp = SystemPath.Select(_ => _.Path);
                 var up = UserPath.Select(_ => _.Path);
                 var cp = sp.Concat(up);
-    
+
                 var s = sp.Where((p, index) => p.Exists && !sp.Take(index).Contains(p));
                 var u = up.Where((p, index) => p.Exists && !cp.Take(sp.Count() + index).Contains(p));
 
@@ -237,20 +239,21 @@ namespace WindowsPathEditor
             }
         }
 
-        public Func <IDataObject, object> FileDropConverter
+        public Func<IDataObject, object> FileDropConverter
         {
             get
             {
-                return data => {
+                return data =>
+                {
                     string path = "...";
                     try
                     {
                         var d = data as System.Windows.DataObject;
                         if (d == null || !d.ContainsFileDropList() || d.GetFileDropList().Count == 0) return null;
-    
+
                         path = d.GetFileDropList()[0];
                         if (File.Exists(path)) path = System.IO.Path.GetDirectoryName(path);
-    
+
                         return new AnnotatedPathEntry(PathEntry.FromFilePath(path));
                     }
                     catch (Exception ex)
@@ -314,7 +317,7 @@ namespace WindowsPathEditor
 
         private void DoSave(object sender, ExecutedRoutedEventArgs e)
         {
-            lock(stateLock)
+            lock (stateLock)
             {
                 var window = new DiffWindow();
                 List<PathEntry> newPaths = new List<PathEntry>(SystemPath.Concat(UserPath).Select(_ => _.Path));
@@ -324,7 +327,7 @@ namespace WindowsPathEditor
                 {
                     window.Changes.Add(x);
                 }
-    
+
                 if (window.ShowDialog() == true)
                 {
                     Write();
@@ -355,10 +358,10 @@ namespace WindowsPathEditor
                 UserPath.SupressNotification = false;
             }
         }
-        
+
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            using (var dialog = new FolderBrowserDialogEx())
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
