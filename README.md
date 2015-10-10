@@ -3,7 +3,7 @@ Windows Path Editor
 
 This tool helps you manage your PATH on Windows.
 
-[Download Latest Version (1.6)](https://github.com/rix0rrr/WindowsPathEditor/releases/download/1.6/windowspatheditor-1.6.zip)
+[Download Latest Version (1.7)](https://github.com/rix0rrr/WindowsPathEditor/releases/download/1.7/windowspatheditor-1.7.zip)
 
 Introduction
 -----------
