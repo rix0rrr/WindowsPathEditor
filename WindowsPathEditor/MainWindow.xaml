@@ -5,7 +5,7 @@
         xmlns:dd="clr-namespace:DragDropListBox"
         Title="Windows Path Editor" Height="495" Width="607" DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"
         WindowStartupLocation="CenterScreen"
-        Closed="Window_Closed" Icon="/WindowsPathEditor;component/Resources/view_text.ico">
+        Closed="Window_Closed" Icon="/WindowsPathEditor;component/Resources/icon.ico">
     <Window.Resources>
         <ContextMenu x:Key="ContextMenu">
             <MenuItem Command="Open">
