@@ -4,7 +4,7 @@
         Title="Confirm Changes" Height="296" Width="383"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" 
         Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"
-        WindowStartupLocation="CenterScreen" Icon="/WindowsPathEditor;component/Resources/view_text.ico">
+        WindowStartupLocation="CenterScreen" Icon="/WindowsPathEditor;component/Resources/icon.ico">
     <Grid>
         <Label Content="Confirm Changes" FontSize="15" Height="30" HorizontalAlignment="Left" Margin="10,10,0,0" Name="whatLabel" VerticalAlignment="Top" />
         <ListBox IsTabStop="False" ItemsSource="{Binding Changes}" Margin="12,46,12,59">
